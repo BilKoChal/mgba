@@ -137,16 +137,16 @@ static int32_t audioLowPassLeftPrev = 0;
 static int32_t audioLowPassRightPrev = 0;
 
 static const int keymap[] = {
-	RETRO_DEVICE_ID_JOYPAD_A,
-	RETRO_DEVICE_ID_JOYPAD_B,
-	RETRO_DEVICE_ID_JOYPAD_SELECT,
-	RETRO_DEVICE_ID_JOYPAD_START,
-	RETRO_DEVICE_ID_JOYPAD_RIGHT,
-	RETRO_DEVICE_ID_JOYPAD_LEFT,
-	RETRO_DEVICE_ID_JOYPAD_UP,
-	RETRO_DEVICE_ID_JOYPAD_DOWN,
-	RETRO_DEVICE_ID_JOYPAD_R,
-	RETRO_DEVICE_ID_JOYPAD_L,
+        RETRO_DEVICE_ID_JOYPAD_A,
+        RETRO_DEVICE_ID_JOYPAD_B,
+        RETRO_DEVICE_ID_JOYPAD_SELECT,
+        RETRO_DEVICE_ID_JOYPAD_START,
+        RETRO_DEVICE_ID_JOYPAD_RIGHT,
+        RETRO_DEVICE_ID_JOYPAD_LEFT,
+        RETRO_DEVICE_ID_JOYPAD_UP,
+        RETRO_DEVICE_ID_JOYPAD_DOWN,
+        RETRO_DEVICE_ID_JOYPAD_R,
+        RETRO_DEVICE_ID_JOYPAD_L,
 };
 
 #ifndef GIT_VERSION
@@ -162,168 +162,168 @@ const char* const projectName = "mGBA";
 /* Frame skipping functions */
 
 static void _retroAudioBuffStatusCallback(bool active, unsigned occupancy, bool underrunLikely) {
-	retroAudioBuffActive    = active;
-	retroAudioBuffOccupancy = occupancy;
-	retroAudioBuffUnderrun  = underrunLikely;
+        retroAudioBuffActive    = active;
+        retroAudioBuffOccupancy = occupancy;
+        retroAudioBuffUnderrun  = underrunLikely;
 }
 
 static void _initFrameskip(void) {
 
-	if (frameskipType > 0) {
+        if (frameskipType > 0) {
 
-		bool calculateAudioLatency = true;
+                bool calculateAudioLatency = true;
 
-		if (frameskipType == 3) { /* Fixed Interval */
-			environCallback(RETRO_ENVIRONMENT_SET_AUDIO_BUFFER_STATUS_CALLBACK, NULL);
-		} else {
+                if (frameskipType == 3) { /* Fixed Interval */
+                        environCallback(RETRO_ENVIRONMENT_SET_AUDIO_BUFFER_STATUS_CALLBACK, NULL);
+                } else {
 
-			struct retro_audio_buffer_status_callback BuffStatusCb;
-			BuffStatusCb.callback = _retroAudioBuffStatusCallback;
+                        struct retro_audio_buffer_status_callback BuffStatusCb;
+                        BuffStatusCb.callback = _retroAudioBuffStatusCallback;
 
-			if (!environCallback(RETRO_ENVIRONMENT_SET_AUDIO_BUFFER_STATUS_CALLBACK, &BuffStatusCb)) {
+                        if (!environCallback(RETRO_ENVIRONMENT_SET_AUDIO_BUFFER_STATUS_CALLBACK, &BuffStatusCb)) {
 
-				if (logCallback)
-					logCallback(RETRO_LOG_WARN, "Frameskip disabled - frontend does not support audio buffer status monitoring.\n");
+                                if (logCallback)
+                                        logCallback(RETRO_LOG_WARN, "Frameskip disabled - frontend does not support audio buffer status monitoring.\n");
 
-				retroAudioBuffActive    = false;
-				retroAudioBuffOccupancy = 0;
-				retroAudioBuffUnderrun  = false;
-				retroAudioLatency       = 0;
-				calculateAudioLatency   = false;
-			}
-		}
+                                retroAudioBuffActive    = false;
+                                retroAudioBuffOccupancy = 0;
+                                retroAudioBuffUnderrun  = false;
+                                retroAudioLatency       = 0;
+                                calculateAudioLatency   = false;
+                        }
+                }
 
-		if (calculateAudioLatency) {
+                if (calculateAudioLatency) {
 
-			/* Frameskip is enabled - increase frontend
-			 * audio latency to minimise potential
-			 * buffer underruns */
-			float frameTimeMsec = 1000.0f * (float)core->frameCycles(core) /
-					(float)core->frequency(core);
+                        /* Frameskip is enabled - increase frontend
+                         * audio latency to minimise potential
+                         * buffer underruns */
+                        float frameTimeMsec = 1000.0f * (float)core->frameCycles(core) /
+                                        (float)core->frequency(core);
 
-			/* Set latency to 6x current frame time... */
-			retroAudioLatency = (unsigned)((6.0f * frameTimeMsec) + 0.5f);
+                        /* Set latency to 6x current frame time... */
+                        retroAudioLatency = (unsigned)((6.0f * frameTimeMsec) + 0.5f);
 
-			/* ...then round up to nearest multiple of 32 */
-			retroAudioLatency = (retroAudioLatency + 0x1F) & ~0x1F;
-		}
+                        /* ...then round up to nearest multiple of 32 */
+                        retroAudioLatency = (retroAudioLatency + 0x1F) & ~0x1F;
+                }
 
-	} else {
-		environCallback(RETRO_ENVIRONMENT_SET_AUDIO_BUFFER_STATUS_CALLBACK, NULL);
-		retroAudioLatency = 0;
-	}
+        } else {
+                environCallback(RETRO_ENVIRONMENT_SET_AUDIO_BUFFER_STATUS_CALLBACK, NULL);
+                retroAudioLatency = 0;
+        }
 
-	updateAudioLatency = true;
+        updateAudioLatency = true;
 }
 
 static void _loadFrameskipSettings(struct mCoreOptions *opts) {
 
-	struct retro_variable var;
-	unsigned oldFrameskipType;
-	unsigned frameskipInterval;
+        struct retro_variable var;
+        unsigned oldFrameskipType;
+        unsigned frameskipInterval;
 
-	var.key   = "mgba_frameskip";
-	var.value = 0;
+        var.key   = "mgba_frameskip";
+        var.value = 0;
 
-	oldFrameskipType = frameskipType;
-	frameskipType    = 0;
+        oldFrameskipType = frameskipType;
+        frameskipType    = 0;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		if (strcmp(var.value, "auto") == 0) {
-			frameskipType = 1;
-		} else if (strcmp(var.value, "auto_threshold") == 0) {
-			frameskipType = 2;
-		} else if (strcmp(var.value, "fixed_interval") == 0) {
-			frameskipType = 3;
-		}
-	}
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                if (strcmp(var.value, "auto") == 0) {
+                        frameskipType = 1;
+                } else if (strcmp(var.value, "auto_threshold") == 0) {
+                        frameskipType = 2;
+                } else if (strcmp(var.value, "fixed_interval") == 0) {
+                        frameskipType = 3;
+                }
+        }
 
-	var.key   = "mgba_frameskip_threshold";
-	var.value = 0;
+        var.key   = "mgba_frameskip_threshold";
+        var.value = 0;
 
-	frameskipThreshold = 33;
+        frameskipThreshold = 33;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-		frameskipThreshold = strtol(var.value, NULL, 10);
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+                frameskipThreshold = strtol(var.value, NULL, 10);
 
-	var.key   = "mgba_frameskip_interval";
-	var.value = 0;
+        var.key   = "mgba_frameskip_interval";
+        var.value = 0;
 
-	frameskipInterval = 0;
+        frameskipInterval = 0;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
-		frameskipInterval = strtol(var.value, NULL, 10);
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value)
+                frameskipInterval = strtol(var.value, NULL, 10);
 
-	/* Update internal (mGBA config) frameskip value */
-	if (opts) {
-		opts->frameskip = (frameskipType == 3) ?
-				frameskipInterval : 0;
-	} else {
-		mCoreConfigSetUIntValue(&core->config, "frameskip",
-				(frameskipType == 3) ? frameskipInterval : 0);
-		mCoreLoadConfig(core);
-	}
+        /* Update internal (mGBA config) frameskip value */
+        if (opts) {
+                opts->frameskip = (frameskipType == 3) ?
+                                frameskipInterval : 0;
+        } else {
+                mCoreConfigSetUIntValue(&core->config, "frameskip",
+                                (frameskipType == 3) ? frameskipInterval : 0);
+                mCoreLoadConfig(core);
+        }
 
-	/* (Re)initialise frameskipping, if required */
-	if (opts || (frameskipType != oldFrameskipType)) {
-		_initFrameskip();
-	}
+        /* (Re)initialise frameskipping, if required */
+        if (opts || (frameskipType != oldFrameskipType)) {
+                _initFrameskip();
+        }
 }
 
 /* Audio post processing */
 static void _audioLowPassFilter(int16_t *buffer, int count) {
 
-	int samples  = count;
-	int16_t *out = buffer;
+        int samples  = count;
+        int16_t *out = buffer;
 
-	/* Restore previous samples */
-	int32_t audioLowPassLeft  = audioLowPassLeftPrev;
-	int32_t audioLowPassRight = audioLowPassRightPrev;
+        /* Restore previous samples */
+        int32_t audioLowPassLeft  = audioLowPassLeftPrev;
+        int32_t audioLowPassRight = audioLowPassRightPrev;
 
-	/* Single-pole low-pass filter (6 dB/octave) */
-	int32_t factorA = audioLowPassRange;
-	int32_t factorB = 0x10000 - factorA;
+        /* Single-pole low-pass filter (6 dB/octave) */
+        int32_t factorA = audioLowPassRange;
+        int32_t factorB = 0x10000 - factorA;
 
-	do {
-		/* Apply low-pass filter */
-		audioLowPassLeft  = (audioLowPassLeft  * factorA) + (*out       * factorB);
-		audioLowPassRight = (audioLowPassRight * factorA) + (*(out + 1) * factorB);
+        do {
+                /* Apply low-pass filter */
+                audioLowPassLeft  = (audioLowPassLeft  * factorA) + (*out       * factorB);
+                audioLowPassRight = (audioLowPassRight * factorA) + (*(out + 1) * factorB);
 
-		/* 16.16 fixed point */
-		audioLowPassLeft  >>= 16;
-		audioLowPassRight >>= 16;
+                /* 16.16 fixed point */
+                audioLowPassLeft  >>= 16;
+                audioLowPassRight >>= 16;
 
-		/* Update sound buffer */
-		*out++ = (int16_t) audioLowPassLeft;
-		*out++ = (int16_t) audioLowPassRight;
-	} while (--samples);
+                /* Update sound buffer */
+                *out++ = (int16_t) audioLowPassLeft;
+                *out++ = (int16_t) audioLowPassRight;
+        } while (--samples);
 
-	/* Save last samples for next frame */
-	audioLowPassLeftPrev  = audioLowPassLeft;
-	audioLowPassRightPrev = audioLowPassRight;
+        /* Save last samples for next frame */
+        audioLowPassLeftPrev  = audioLowPassLeft;
+        audioLowPassRightPrev = audioLowPassRight;
 }
 
 static void _loadAudioLowPassFilterSettings(void) {
 
-	struct retro_variable var;
-	audioLowPassEnabled = false;
-	audioLowPassRange = (60 * 0x10000) / 100;
+        struct retro_variable var;
+        audioLowPassEnabled = false;
+        audioLowPassRange = (60 * 0x10000) / 100;
 
-	var.key = "mgba_audio_low_pass_filter";
-	var.value = 0;
+        var.key = "mgba_audio_low_pass_filter";
+        var.value = 0;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		if (strcmp(var.value, "enabled") == 0) {
-			audioLowPassEnabled = true;
-		}
-	}
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                if (strcmp(var.value, "enabled") == 0) {
+                        audioLowPassEnabled = true;
+                }
+        }
 
-	var.key = "mgba_audio_low_pass_range";
-	var.value = 0;
+        var.key = "mgba_audio_low_pass_range";
+        var.value = 0;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		audioLowPassRange = (strtol(var.value, NULL, 10) * 0x10000) / 100;
-	}
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                audioLowPassRange = (strtol(var.value, NULL, 10) * 0x10000) / 100;
+        }
 }
 
 /* Video post processing */
@@ -366,178 +366,178 @@ static bool colorCorrectionEnabled = false;
 
 static void _initColorCorrection(void) {
 
-	/* Constants */
-	static const float displayGammaInv = 1.0f / CC_TARGET_GAMMA;
-	static const float rgbMaxInv = 1.0f / CC_RGB_MAX;
+        /* Constants */
+        static const float displayGammaInv = 1.0f / CC_TARGET_GAMMA;
+        static const float rgbMaxInv = 1.0f / CC_RGB_MAX;
 
-	/* Variables */
-	enum GBModel model = GB_MODEL_AUTODETECT;
-	float ccLum;
-	float ccR;
-	float ccG;
-	float ccB;
-	float ccRG;
-	float ccRB;
-	float ccGR;
-	float ccGB;
-	float ccBR;
-	float ccBG;
-	float adjustedGamma;
-	size_t color;
+        /* Variables */
+        enum GBModel model = GB_MODEL_AUTODETECT;
+        float ccLum;
+        float ccR;
+        float ccG;
+        float ccB;
+        float ccRG;
+        float ccRB;
+        float ccGR;
+        float ccGB;
+        float ccBR;
+        float ccBG;
+        float adjustedGamma;
+        size_t color;
 
-	/* Set colour correction parameters */
-	colorCorrectionEnabled = false;
-	switch (ccType) {
-		case 1:
-			model = GB_MODEL_AGB;
-			break;
-		case 2:
-			model = GB_MODEL_CGB;
-			break;
-		case 3:
-			{
-				/* Autodetect
-				 * (Note: This is somewhat clumsy due to the
-				 *  M_CORE_GBA & M_CORE_GB defines... */
+        /* Set colour correction parameters */
+        colorCorrectionEnabled = false;
+        switch (ccType) {
+                case 1:
+                        model = GB_MODEL_AGB;
+                        break;
+                case 2:
+                        model = GB_MODEL_CGB;
+                        break;
+                case 3:
+                        {
+                                /* Autodetect
+                                 * (Note: This is somewhat clumsy due to the
+                                 *  M_CORE_GBA & M_CORE_GB defines... */
 #ifdef M_CORE_GBA
-				if (core->platform(core) == mPLATFORM_GBA) {
-					model = GB_MODEL_AGB;
-				}
+                                if (core->platform(core) == mPLATFORM_GBA) {
+                                        model = GB_MODEL_AGB;
+                                }
 #endif
 
 #ifdef M_CORE_GB
-				if (model != GB_MODEL_AGB) {
-					if (core->platform(core) == mPLATFORM_GB) {
+                                if (model != GB_MODEL_AGB) {
+                                        if (core->platform(core) == mPLATFORM_GB) {
 
-						const char* modelName = mCoreConfigGetValue(&core->config, "gb.model");
-						struct GB* gb = core->board;
+                                                const char* modelName = mCoreConfigGetValue(&core->config, "gb.model");
+                                                struct GB* gb = core->board;
 
-						if (modelName) {
-							gb->model = GBNameToModel(modelName);
-						} else {
-							GBDetectModel(gb);
-						}
+                                                if (modelName) {
+                                                        gb->model = GBNameToModel(modelName);
+                                                } else {
+                                                        GBDetectModel(gb);
+                                                }
 
-						if (gb->model == GB_MODEL_CGB) {
-							model = GB_MODEL_CGB;
-						}
-					}
-				}
+                                                if (gb->model == GB_MODEL_CGB) {
+                                                        model = GB_MODEL_CGB;
+                                                }
+                                        }
+                                }
 #endif
-			}
-			break;
-		default:
-			return;
-	}
+                        }
+                        break;
+                default:
+                        return;
+        }
 
-	switch (model) {
-		case GB_MODEL_AGB:
-			ccLum = GBA_CC_LUM;
-			ccR   = GBA_CC_R;
-			ccG   = GBA_CC_G;
-			ccB   = GBA_CC_B;
-			ccRG  = GBA_CC_RG;
-			ccRB  = GBA_CC_RB;
-			ccGR  = GBA_CC_GR;
-			ccGB  = GBA_CC_GB;
-			ccBR  = GBA_CC_BR;
-			ccBG  = GBA_CC_BG;
-			adjustedGamma = CC_TARGET_GAMMA + GBA_CC_GAMMA_ADJ;
-			break;
-		case GB_MODEL_CGB:
-			ccLum = GBC_CC_LUM;
-			ccR   = GBC_CC_R;
-			ccG   = GBC_CC_G;
-			ccB   = GBC_CC_B;
-			ccRG  = GBC_CC_RG;
-			ccRB  = GBC_CC_RB;
-			ccGR  = GBC_CC_GR;
-			ccGB  = GBC_CC_GB;
-			ccBR  = GBC_CC_BR;
-			ccBG  = GBC_CC_BG;
-			adjustedGamma = CC_TARGET_GAMMA + GBC_CC_GAMMA_ADJ;
-			break;
-		default:
-			return;
-	}
+        switch (model) {
+                case GB_MODEL_AGB:
+                        ccLum = GBA_CC_LUM;
+                        ccR   = GBA_CC_R;
+                        ccG   = GBA_CC_G;
+                        ccB   = GBA_CC_B;
+                        ccRG  = GBA_CC_RG;
+                        ccRB  = GBA_CC_RB;
+                        ccGR  = GBA_CC_GR;
+                        ccGB  = GBA_CC_GB;
+                        ccBR  = GBA_CC_BR;
+                        ccBG  = GBA_CC_BG;
+                        adjustedGamma = CC_TARGET_GAMMA + GBA_CC_GAMMA_ADJ;
+                        break;
+                case GB_MODEL_CGB:
+                        ccLum = GBC_CC_LUM;
+                        ccR   = GBC_CC_R;
+                        ccG   = GBC_CC_G;
+                        ccB   = GBC_CC_B;
+                        ccRG  = GBC_CC_RG;
+                        ccRB  = GBC_CC_RB;
+                        ccGR  = GBC_CC_GR;
+                        ccGB  = GBC_CC_GB;
+                        ccBR  = GBC_CC_BR;
+                        ccBG  = GBC_CC_BG;
+                        adjustedGamma = CC_TARGET_GAMMA + GBC_CC_GAMMA_ADJ;
+                        break;
+                default:
+                        return;
+        }
 
-	/* Allocate look-up table buffer, if required */
-	if (!ccLUT) {
-		size_t lutSize = 65536 * sizeof(mColor);
-		ccLUT = malloc(lutSize);
-		if (!ccLUT) {
-			return;
-		}
-		memset(ccLUT, 0xFF, lutSize);
-	}
+        /* Allocate look-up table buffer, if required */
+        if (!ccLUT) {
+                size_t lutSize = 65536 * sizeof(mColor);
+                ccLUT = malloc(lutSize);
+                if (!ccLUT) {
+                        return;
+                }
+                memset(ccLUT, 0xFF, lutSize);
+        }
 
-	/* If we get this far, then colour correction is enabled... */
-	colorCorrectionEnabled = true;
+        /* If we get this far, then colour correction is enabled... */
+        colorCorrectionEnabled = true;
 
-	/* Populate colour correction look-up table
-	 * Note: This is somewhat slow (~100 ms on desktop),
-	 * but using precompiled look-up tables would double
-	 * the memory requirements, and make updating colour
-	 * correction parameters an absolute nightmare...) */
-	for (color = 0; color < 65536; color++) {
-		unsigned rFinal = 0;
-		unsigned gFinal = 0;
-		unsigned bFinal = 0;
-		/* Extract values from RGB565 input */
-		const unsigned r = color >> 11 & 0x1F;
-		const unsigned g = color >>  6 & 0x1F;
-		const unsigned b = color       & 0x1F;
-		/* Perform gamma expansion */
-		float rFloat = pow((float)r * rgbMaxInv, adjustedGamma);
-		float gFloat = pow((float)g * rgbMaxInv, adjustedGamma);
-		float bFloat = pow((float)b * rgbMaxInv, adjustedGamma);
-		/* Perform colour mangling */
-		float rCorrect = ccLum * ((ccR  * rFloat) + (ccGR * gFloat) + (ccBR * bFloat));
-		float gCorrect = ccLum * ((ccRG * rFloat) + (ccG  * gFloat) + (ccBG * bFloat));
-		float bCorrect = ccLum * ((ccRB * rFloat) + (ccGB * gFloat) + (ccB  * bFloat));
-		/* Range check... */
-		rCorrect = rCorrect > 0.0f ? rCorrect : 0.0f;
-		gCorrect = gCorrect > 0.0f ? gCorrect : 0.0f;
-		bCorrect = bCorrect > 0.0f ? bCorrect : 0.0f;
-		/* Perform gamma compression */
-		rCorrect = pow(rCorrect, displayGammaInv);
-		gCorrect = pow(gCorrect, displayGammaInv);
-		bCorrect = pow(bCorrect, displayGammaInv);
-		/* Range check... */
-		rCorrect = rCorrect > 1.0f ? 1.0f : rCorrect;
-		gCorrect = gCorrect > 1.0f ? 1.0f : gCorrect;
-		bCorrect = bCorrect > 1.0f ? 1.0f : bCorrect;
-		/* Convert back to RGB565 */
-		rFinal = (unsigned)((rCorrect * CC_RGB_MAX) + 0.5f) & 0x1F;
-		gFinal = (unsigned)((gCorrect * CC_RGB_MAX) + 0.5f) & 0x1F;
-		bFinal = (unsigned)((bCorrect * CC_RGB_MAX) + 0.5f) & 0x1F;
-		ccLUT[color] = rFinal << 11 | gFinal << 6 | bFinal;
-	}
+        /* Populate colour correction look-up table
+         * Note: This is somewhat slow (~100 ms on desktop),
+         * but using precompiled look-up tables would double
+         * the memory requirements, and make updating colour
+         * correction parameters an absolute nightmare...) */
+        for (color = 0; color < 65536; color++) {
+                unsigned rFinal = 0;
+                unsigned gFinal = 0;
+                unsigned bFinal = 0;
+                /* Extract values from RGB565 input */
+                const unsigned r = color >> 11 & 0x1F;
+                const unsigned g = color >>  6 & 0x1F;
+                const unsigned b = color       & 0x1F;
+                /* Perform gamma expansion */
+                float rFloat = pow((float)r * rgbMaxInv, adjustedGamma);
+                float gFloat = pow((float)g * rgbMaxInv, adjustedGamma);
+                float bFloat = pow((float)b * rgbMaxInv, adjustedGamma);
+                /* Perform colour mangling */
+                float rCorrect = ccLum * ((ccR  * rFloat) + (ccGR * gFloat) + (ccBR * bFloat));
+                float gCorrect = ccLum * ((ccRG * rFloat) + (ccG  * gFloat) + (ccBG * bFloat));
+                float bCorrect = ccLum * ((ccRB * rFloat) + (ccGB * gFloat) + (ccB  * bFloat));
+                /* Range check... */
+                rCorrect = rCorrect > 0.0f ? rCorrect : 0.0f;
+                gCorrect = gCorrect > 0.0f ? gCorrect : 0.0f;
+                bCorrect = bCorrect > 0.0f ? bCorrect : 0.0f;
+                /* Perform gamma compression */
+                rCorrect = pow(rCorrect, displayGammaInv);
+                gCorrect = pow(gCorrect, displayGammaInv);
+                bCorrect = pow(bCorrect, displayGammaInv);
+                /* Range check... */
+                rCorrect = rCorrect > 1.0f ? 1.0f : rCorrect;
+                gCorrect = gCorrect > 1.0f ? 1.0f : gCorrect;
+                bCorrect = bCorrect > 1.0f ? 1.0f : bCorrect;
+                /* Convert back to RGB565 */
+                rFinal = (unsigned)((rCorrect * CC_RGB_MAX) + 0.5f) & 0x1F;
+                gFinal = (unsigned)((gCorrect * CC_RGB_MAX) + 0.5f) & 0x1F;
+                bFinal = (unsigned)((bCorrect * CC_RGB_MAX) + 0.5f) & 0x1F;
+                ccLUT[color] = rFinal << 11 | gFinal << 6 | bFinal;
+        }
 }
 
 static void _loadColorCorrectionSettings(void) {
-	struct retro_variable var;
-	unsigned oldCcType = ccType;
-	ccType = 0;
+        struct retro_variable var;
+        unsigned oldCcType = ccType;
+        ccType = 0;
 
-	var.key = "mgba_color_correction";
-	var.value = 0;
+        var.key = "mgba_color_correction";
+        var.value = 0;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		if (strcmp(var.value, "GBA") == 0) {
-			ccType = 1;
-		} else if (strcmp(var.value, "GBC") == 0) {
-			ccType = 2;
-		} else if (strcmp(var.value, "Auto") == 0) {
-			ccType = 3;
-		}
-	}
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                if (strcmp(var.value, "GBA") == 0) {
+                        ccType = 1;
+                } else if (strcmp(var.value, "GBC") == 0) {
+                        ccType = 2;
+                } else if (strcmp(var.value, "Auto") == 0) {
+                        ccType = 3;
+                }
+        }
 
-	if (ccType == 0) {
-		colorCorrectionEnabled = false;
-	} else if (ccType != oldCcType) {
-		_initColorCorrection();
-	}
+        if (ccType == 0) {
+                colorCorrectionEnabled = false;
+        } else if (ccType != oldCcType) {
+                _initColorCorrection();
+        }
 }
 
 /* Interframe blending */
@@ -571,160 +571,160 @@ static float frameBlendResponse[4]            = {0.0f};
 static bool frameBlendResponseSet             = false;
 
 static bool _allocateOutputBufferPrev(mColor** buf) {
-	if (!*buf) {
-		*buf = malloc(VIDEO_BUFF_SIZE);
-		if (!*buf) {
-			return false;
-		}
-	}
-	memset(*buf, 0xFFFF, VIDEO_BUFF_SIZE);
-	return true;
+        if (!*buf) {
+                *buf = malloc(VIDEO_BUFF_SIZE);
+                if (!*buf) {
+                        return false;
+                }
+        }
+        memset(*buf, 0xFFFF, VIDEO_BUFF_SIZE);
+        return true;
 }
 
 static bool _allocateOutputBufferAcc(void) {
-	size_t i;
-	size_t buf_size = VIDEO_WIDTH_MAX * VIDEO_HEIGHT_MAX * sizeof(float);
+        size_t i;
+        size_t buf_size = VIDEO_WIDTH_MAX * VIDEO_HEIGHT_MAX * sizeof(float);
 
-	if (!outputBufferAccR) {
-		outputBufferAccR = malloc(buf_size);
-		if (!outputBufferAccR) {
-			return false;
-		}
-	}
+        if (!outputBufferAccR) {
+                outputBufferAccR = malloc(buf_size);
+                if (!outputBufferAccR) {
+                        return false;
+                }
+        }
 
-	if (!outputBufferAccG) {
-		outputBufferAccG = malloc(buf_size);
-		if (!outputBufferAccG) {
-			return false;
-		}
-	}
+        if (!outputBufferAccG) {
+                outputBufferAccG = malloc(buf_size);
+                if (!outputBufferAccG) {
+                        return false;
+                }
+        }
 
-	if (!outputBufferAccB) {
-		outputBufferAccB = malloc(buf_size);
-		if (!outputBufferAccB) {
-			return false;
-		}
-	}
+        if (!outputBufferAccB) {
+                outputBufferAccB = malloc(buf_size);
+                if (!outputBufferAccB) {
+                        return false;
+                }
+        }
 
-	/* Cannot use memset() on arrays of floats... */
-	for (i = 0; i < (VIDEO_WIDTH_MAX * VIDEO_HEIGHT_MAX); i++) {
-		outputBufferAccR[i] = 1.0f;
-		outputBufferAccG[i] = 1.0f;
-		outputBufferAccB[i] = 1.0f;
-	}
-	return true;
+        /* Cannot use memset() on arrays of floats... */
+        for (i = 0; i < (VIDEO_WIDTH_MAX * VIDEO_HEIGHT_MAX); i++) {
+                outputBufferAccR[i] = 1.0f;
+                outputBufferAccG[i] = 1.0f;
+                outputBufferAccB[i] = 1.0f;
+        }
+        return true;
 }
 
 static void _initFrameBlend(void) {
 
-	frameBlendEnabled = false;
+        frameBlendEnabled = false;
 
-	/* Allocate interframe blending buffers, as required
-	 * NOTE: In all cases, any used buffers are 'reset'
-	 * (filled with 0xFF) to avoid drawing garbage on
-	 * the next frame */
-	switch (frameBlendType) {
-		case FRAME_BLEND_MIX:
-			/* Simple 50:50 blending requires a single buffer */
-			if (!_allocateOutputBufferPrev(&outputBufferPrev1)) {
-				return;
-			}
-			break;
-		case FRAME_BLEND_MIX_SMART:
-			/* Smart 50:50 blending requires three buffers */
-			if (!_allocateOutputBufferPrev(&outputBufferPrev1)) {
-				return;
-			}
-			if (!_allocateOutputBufferPrev(&outputBufferPrev2)) {
-				return;
-			}
-			if (!_allocateOutputBufferPrev(&outputBufferPrev3)) {
-				return;
-			}
-			break;
-		case FRAME_BLEND_LCD_GHOSTING:
-			/* 'Accurate' LCD ghosting requires four buffers */
-			if (!_allocateOutputBufferPrev(&outputBufferPrev1)) {
-				return;
-			}
-			if (!_allocateOutputBufferPrev(&outputBufferPrev2)) {
-				return;
-			}
-			if (!_allocateOutputBufferPrev(&outputBufferPrev3)) {
-				return;
-			}
-			if (!_allocateOutputBufferPrev(&outputBufferPrev4)) {
-				return;
-			}
-			break;
-		case FRAME_BLEND_LCD_GHOSTING_FAST:
-			/* 'Fast' LCD ghosting requires three (RGB)
-			 * 'accumulator' buffers */
-			if (!_allocateOutputBufferAcc()) {
-				return;
-			}
-			break;
-		case FRAME_BLEND_NONE:
-		default:
-			/* Error condition - cannot happen
-			 * > Just leave frameBlendEnabled set to false */
-			return;
-	}
+        /* Allocate interframe blending buffers, as required
+         * NOTE: In all cases, any used buffers are 'reset'
+         * (filled with 0xFF) to avoid drawing garbage on
+         * the next frame */
+        switch (frameBlendType) {
+                case FRAME_BLEND_MIX:
+                        /* Simple 50:50 blending requires a single buffer */
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev1)) {
+                                return;
+                        }
+                        break;
+                case FRAME_BLEND_MIX_SMART:
+                        /* Smart 50:50 blending requires three buffers */
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev1)) {
+                                return;
+                        }
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev2)) {
+                                return;
+                        }
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev3)) {
+                                return;
+                        }
+                        break;
+                case FRAME_BLEND_LCD_GHOSTING:
+                        /* 'Accurate' LCD ghosting requires four buffers */
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev1)) {
+                                return;
+                        }
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev2)) {
+                                return;
+                        }
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev3)) {
+                                return;
+                        }
+                        if (!_allocateOutputBufferPrev(&outputBufferPrev4)) {
+                                return;
+                        }
+                        break;
+                case FRAME_BLEND_LCD_GHOSTING_FAST:
+                        /* 'Fast' LCD ghosting requires three (RGB)
+                         * 'accumulator' buffers */
+                        if (!_allocateOutputBufferAcc()) {
+                                return;
+                        }
+                        break;
+                case FRAME_BLEND_NONE:
+                default:
+                        /* Error condition - cannot happen
+                         * > Just leave frameBlendEnabled set to false */
+                        return;
+        }
 
-	/* Set LCD ghosting response time factors,
-	 * if required */
-	if ((frameBlendType == FRAME_BLEND_LCD_GHOSTING) &&
-	    !frameBlendResponseSet) {
+        /* Set LCD ghosting response time factors,
+         * if required */
+        if ((frameBlendType == FRAME_BLEND_LCD_GHOSTING) &&
+            !frameBlendResponseSet) {
 
-		/* For the default response time of 0.333,
-		 * only four previous samples are required
-		 * since the response factor for the fifth
-		 * is:
-		 *    pow(LCD_RESPONSE_TIME, 5.0f) -> 0.00409
-		 * ...which is less than half a percent, and
-		 * therefore irrelevant.
-		 * If the response time were significantly
-		 * increased, we may need to rethink this
-		 * (but more samples == greater performance
-		 * overheads) */
-		frameBlendResponse[0] = LCD_RESPONSE_TIME;
-		frameBlendResponse[1] = pow(LCD_RESPONSE_TIME, 2.0f);
-		frameBlendResponse[2] = pow(LCD_RESPONSE_TIME, 3.0f);
-		frameBlendResponse[3] = pow(LCD_RESPONSE_TIME, 4.0f);
+                /* For the default response time of 0.333,
+                 * only four previous samples are required
+                 * since the response factor for the fifth
+                 * is:
+                 *    pow(LCD_RESPONSE_TIME, 5.0f) -> 0.00409
+                 * ...which is less than half a percent, and
+                 * therefore irrelevant.
+                 * If the response time were significantly
+                 * increased, we may need to rethink this
+                 * (but more samples == greater performance
+                 * overheads) */
+                frameBlendResponse[0] = LCD_RESPONSE_TIME;
+                frameBlendResponse[1] = pow(LCD_RESPONSE_TIME, 2.0f);
+                frameBlendResponse[2] = pow(LCD_RESPONSE_TIME, 3.0f);
+                frameBlendResponse[3] = pow(LCD_RESPONSE_TIME, 4.0f);
 
-		frameBlendResponseSet = true;
-	}
+                frameBlendResponseSet = true;
+        }
 
-	/* If we get this far, then interframe blending is enabled... */
-	frameBlendEnabled = true;
+        /* If we get this far, then interframe blending is enabled... */
+        frameBlendEnabled = true;
 }
 
 static void _loadFrameBlendSettings(void) {
 
-	struct retro_variable var;
-	enum frame_blend_method oldFrameBlendType = frameBlendType;
-	frameBlendType = FRAME_BLEND_NONE;
+        struct retro_variable var;
+        enum frame_blend_method oldFrameBlendType = frameBlendType;
+        frameBlendType = FRAME_BLEND_NONE;
 
-	var.key = "mgba_interframe_blending";
-	var.value = 0;
+        var.key = "mgba_interframe_blending";
+        var.value = 0;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		if (strcmp(var.value, "mix") == 0) {
-			frameBlendType = FRAME_BLEND_MIX;
-		} else if (strcmp(var.value, "mix_smart") == 0) {
-			frameBlendType = FRAME_BLEND_MIX_SMART;
-		} else if (strcmp(var.value, "lcd_ghosting") == 0) {
-			frameBlendType = FRAME_BLEND_LCD_GHOSTING;
-		} else if (strcmp(var.value, "lcd_ghosting_fast") == 0) {
-			frameBlendType = FRAME_BLEND_LCD_GHOSTING_FAST;
-		}
-	}
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                if (strcmp(var.value, "mix") == 0) {
+                        frameBlendType = FRAME_BLEND_MIX;
+                } else if (strcmp(var.value, "mix_smart") == 0) {
+                        frameBlendType = FRAME_BLEND_MIX_SMART;
+                } else if (strcmp(var.value, "lcd_ghosting") == 0) {
+                        frameBlendType = FRAME_BLEND_LCD_GHOSTING;
+                } else if (strcmp(var.value, "lcd_ghosting_fast") == 0) {
+                        frameBlendType = FRAME_BLEND_LCD_GHOSTING_FAST;
+                }
+        }
 
-	if (frameBlendType == FRAME_BLEND_NONE) {
-		frameBlendEnabled = false;
-	} else if (frameBlendType != oldFrameBlendType) {
-		_initFrameBlend();
-	}
+        if (frameBlendType == FRAME_BLEND_NONE) {
+                frameBlendEnabled = false;
+        } else if (frameBlendType != oldFrameBlendType) {
+                _initFrameBlend();
+        }
 }
 
 /* General post processing buffers/functions */
@@ -739,940 +739,1450 @@ static void (*videoPostProcess)(unsigned width, unsigned height) = NULL;
  *   minimise logic in the inner loops where possible  */
 static void videoPostProcessCc(unsigned width, unsigned height) {
 
-	mColor *src = outputBuffer;
-	mColor *dst = ppOutputBuffer;
-	size_t x, y;
+        mColor *src = outputBuffer;
+        mColor *dst = ppOutputBuffer;
+        size_t x, y;
 
-	for (y = 0; y < height; y++) {
-		for (x = 0; x < width; x++) {
-			*(dst + x) = *(ccLUT + *(src + x));
-		}
-		src += VIDEO_WIDTH_MAX;
-		dst += VIDEO_WIDTH_MAX;
-	}
+        for (y = 0; y < height; y++) {
+                for (x = 0; x < width; x++) {
+                        *(dst + x) = *(ccLUT + *(src + x));
+                }
+                src += VIDEO_WIDTH_MAX;
+                dst += VIDEO_WIDTH_MAX;
+        }
 }
 
 static void videoPostProcessMix(unsigned width, unsigned height) {
 
-	mColor *srcCurr = outputBuffer;
-	mColor *srcPrev = outputBufferPrev1;
-	mColor *dst     = ppOutputBuffer;
-	size_t x, y;
+        mColor *srcCurr = outputBuffer;
+        mColor *srcPrev = outputBufferPrev1;
+        mColor *dst     = ppOutputBuffer;
+        size_t x, y;
 
-	for (y = 0; y < height; y++) {
-		for (x = 0; x < width; x++) {
+        for (y = 0; y < height; y++) {
+                for (x = 0; x < width; x++) {
 
-			/* Get colours from current + previous frames */
-			mColor rgbCurr = *(srcCurr + x);
-			mColor rgbPrev = *(srcPrev + x);
+                        /* Get colours from current + previous frames */
+                        mColor rgbCurr = *(srcCurr + x);
+                        mColor rgbPrev = *(srcPrev + x);
 
-			/* Store colours for next frame */
-			*(srcPrev + x) = rgbCurr;
+                        /* Store colours for next frame */
+                        *(srcPrev + x) = rgbCurr;
 
-			/* Mix colours
-			 * > "Mixing Packed RGB Pixels Efficiently"
-			 *   http://blargg.8bitalley.com/info/rgb_mixing.html */
-			mColor rgbMix  = (rgbCurr + rgbPrev + ((rgbCurr ^ rgbPrev) & 0x821)) >> 1;
+                        /* Mix colours
+                         * > "Mixing Packed RGB Pixels Efficiently"
+                         *   http://blargg.8bitalley.com/info/rgb_mixing.html */
+                        mColor rgbMix  = (rgbCurr + rgbPrev + ((rgbCurr ^ rgbPrev) & 0x821)) >> 1;
 
-			/* Assign colours for current frame */
-			*(dst + x)      = colorCorrectionEnabled ?
-					*(ccLUT + rgbMix) : rgbMix;
-		}
-		srcCurr += VIDEO_WIDTH_MAX;
-		srcPrev += VIDEO_WIDTH_MAX;
-		dst     += VIDEO_WIDTH_MAX;
-	}
+                        /* Assign colours for current frame */
+                        *(dst + x)      = colorCorrectionEnabled ?
+                                        *(ccLUT + rgbMix) : rgbMix;
+                }
+                srcCurr += VIDEO_WIDTH_MAX;
+                srcPrev += VIDEO_WIDTH_MAX;
+                dst     += VIDEO_WIDTH_MAX;
+        }
 }
 
 static void videoPostProcessMixSmart(unsigned width, unsigned height) {
 
-	mColor *srcCurr  = outputBuffer;
-	mColor *srcPrev1 = outputBufferPrev1;
-	mColor *srcPrev2 = outputBufferPrev2;
-	mColor *srcPrev3 = outputBufferPrev3;
-	mColor *dst      = ppOutputBuffer;
-	size_t x, y;
+        mColor *srcCurr  = outputBuffer;
+        mColor *srcPrev1 = outputBufferPrev1;
+        mColor *srcPrev2 = outputBufferPrev2;
+        mColor *srcPrev3 = outputBufferPrev3;
+        mColor *dst      = ppOutputBuffer;
+        size_t x, y;
 
-	for (y = 0; y < height; y++) {
-		for (x = 0; x < width; x++) {
+        for (y = 0; y < height; y++) {
+                for (x = 0; x < width; x++) {
 
-			/* Get colours from current + previous frames */
-			mColor rgbCurr  = *(srcCurr + x);
-			mColor rgbPrev1 = *(srcPrev1 + x);
-			mColor rgbPrev2 = *(srcPrev2 + x);
-			mColor rgbPrev3 = *(srcPrev3 + x);
+                        /* Get colours from current + previous frames */
+                        mColor rgbCurr  = *(srcCurr + x);
+                        mColor rgbPrev1 = *(srcPrev1 + x);
+                        mColor rgbPrev2 = *(srcPrev2 + x);
+                        mColor rgbPrev3 = *(srcPrev3 + x);
 
-			/* Store colours for next frame */
-			*(srcPrev1 + x) = rgbCurr;
-			*(srcPrev2 + x) = rgbPrev1;
-			*(srcPrev3 + x) = rgbPrev2;
+                        /* Store colours for next frame */
+                        *(srcPrev1 + x) = rgbCurr;
+                        *(srcPrev2 + x) = rgbPrev1;
+                        *(srcPrev3 + x) = rgbPrev2;
 
-			/* Determine whether mixing is required
-			 * i.e. whether alternate frames have the same pixel colour,
-			 * but adjacent frames do not */
-			if (((rgbCurr == rgbPrev2) || (rgbPrev1 == rgbPrev3)) &&
-				 (rgbCurr != rgbPrev1) &&
-				 (rgbCurr != rgbPrev3) &&
-				 (rgbPrev1 != rgbPrev2)) {
+                        /* Determine whether mixing is required
+                         * i.e. whether alternate frames have the same pixel colour,
+                         * but adjacent frames do not */
+                        if (((rgbCurr == rgbPrev2) || (rgbPrev1 == rgbPrev3)) &&
+                                 (rgbCurr != rgbPrev1) &&
+                                 (rgbCurr != rgbPrev3) &&
+                                 (rgbPrev1 != rgbPrev2)) {
 
-				/* Mix colours
-				 * > "Mixing Packed RGB Pixels Efficiently"
-				 *   http://blargg.8bitalley.com/info/rgb_mixing.html */
-				mColor rgbMix = (rgbCurr + rgbPrev1 + ((rgbCurr ^ rgbPrev1) & 0x821)) >> 1;
+                                /* Mix colours
+                                 * > "Mixing Packed RGB Pixels Efficiently"
+                                 *   http://blargg.8bitalley.com/info/rgb_mixing.html */
+                                mColor rgbMix = (rgbCurr + rgbPrev1 + ((rgbCurr ^ rgbPrev1) & 0x821)) >> 1;
 
-				/* Assign colours for current frame */
-				*(dst + x) = colorCorrectionEnabled ?
-						*(ccLUT + rgbMix) : rgbMix;
+                                /* Assign colours for current frame */
+                                *(dst + x) = colorCorrectionEnabled ?
+                                                *(ccLUT + rgbMix) : rgbMix;
 
-			} else {
-				/* Just use colours for current frame */
-				*(dst + x) = colorCorrectionEnabled ?
-						*(ccLUT + rgbCurr) :	rgbCurr;
-			}
-		}
-		srcCurr  += VIDEO_WIDTH_MAX;
-		srcPrev1 += VIDEO_WIDTH_MAX;
-		srcPrev2 += VIDEO_WIDTH_MAX;
-		srcPrev3 += VIDEO_WIDTH_MAX;
-		dst      += VIDEO_WIDTH_MAX;
-	}
+                        } else {
+                                /* Just use colours for current frame */
+                                *(dst + x) = colorCorrectionEnabled ?
+                                                *(ccLUT + rgbCurr) :    rgbCurr;
+                        }
+                }
+                srcCurr  += VIDEO_WIDTH_MAX;
+                srcPrev1 += VIDEO_WIDTH_MAX;
+                srcPrev2 += VIDEO_WIDTH_MAX;
+                srcPrev3 += VIDEO_WIDTH_MAX;
+                dst      += VIDEO_WIDTH_MAX;
+        }
 }
 
 static void videoPostProcessLcdGhost(unsigned width, unsigned height) {
 
-	mColor *srcCurr  = outputBuffer;
-	mColor *srcPrev1 = outputBufferPrev1;
-	mColor *srcPrev2 = outputBufferPrev2;
-	mColor *srcPrev3 = outputBufferPrev3;
-	mColor *srcPrev4 = outputBufferPrev4;
-	mColor *dst      = ppOutputBuffer;
-	float *response  = frameBlendResponse;
-	size_t x, y;
+        mColor *srcCurr  = outputBuffer;
+        mColor *srcPrev1 = outputBufferPrev1;
+        mColor *srcPrev2 = outputBufferPrev2;
+        mColor *srcPrev3 = outputBufferPrev3;
+        mColor *srcPrev4 = outputBufferPrev4;
+        mColor *dst      = ppOutputBuffer;
+        float *response  = frameBlendResponse;
+        size_t x, y;
 
-	for (y = 0; y < height; y++) {
-		for (x = 0; x < width; x++) {
+        for (y = 0; y < height; y++) {
+                for (x = 0; x < width; x++) {
 
-			/* Get colours from current + previous frames */
-			mColor rgbCurr  = *(srcCurr + x);
-			mColor rgbPrev1 = *(srcPrev1 + x);
-			mColor rgbPrev2 = *(srcPrev2 + x);
-			mColor rgbPrev3 = *(srcPrev3 + x);
-			mColor rgbPrev4 = *(srcPrev4 + x);
+                        /* Get colours from current + previous frames */
+                        mColor rgbCurr  = *(srcCurr + x);
+                        mColor rgbPrev1 = *(srcPrev1 + x);
+                        mColor rgbPrev2 = *(srcPrev2 + x);
+                        mColor rgbPrev3 = *(srcPrev3 + x);
+                        mColor rgbPrev4 = *(srcPrev4 + x);
 
-			/* Store colours for next frame */
-			*(srcPrev1 + x) = rgbCurr;
-			*(srcPrev2 + x) = rgbPrev1;
-			*(srcPrev3 + x) = rgbPrev2;
-			*(srcPrev4 + x) = rgbPrev3;
+                        /* Store colours for next frame */
+                        *(srcPrev1 + x) = rgbCurr;
+                        *(srcPrev2 + x) = rgbPrev1;
+                        *(srcPrev3 + x) = rgbPrev2;
+                        *(srcPrev4 + x) = rgbPrev3;
 
-			/* Unpack colours and convert to float */
-			float rCurr = (float)(rgbCurr >> 11 & 0x1F);
-			float gCurr = (float)(rgbCurr >>  6 & 0x1F);
-			float bCurr = (float)(rgbCurr       & 0x1F);
+                        /* Unpack colours and convert to float */
+                        float rCurr = (float)(rgbCurr >> 11 & 0x1F);
+                        float gCurr = (float)(rgbCurr >>  6 & 0x1F);
+                        float bCurr = (float)(rgbCurr       & 0x1F);
 
-			float rPrev1 = (float)(rgbPrev1 >> 11 & 0x1F);
-			float gPrev1 = (float)(rgbPrev1 >>  6 & 0x1F);
-			float bPrev1 = (float)(rgbPrev1       & 0x1F);
+                        float rPrev1 = (float)(rgbPrev1 >> 11 & 0x1F);
+                        float gPrev1 = (float)(rgbPrev1 >>  6 & 0x1F);
+                        float bPrev1 = (float)(rgbPrev1       & 0x1F);
 
-			float rPrev2 = (float)(rgbPrev2 >> 11 & 0x1F);
-			float gPrev2 = (float)(rgbPrev2 >>  6 & 0x1F);
-			float bPrev2 = (float)(rgbPrev2       & 0x1F);
+                        float rPrev2 = (float)(rgbPrev2 >> 11 & 0x1F);
+                        float gPrev2 = (float)(rgbPrev2 >>  6 & 0x1F);
+                        float bPrev2 = (float)(rgbPrev2       & 0x1F);
 
-			float rPrev3 = (float)(rgbPrev3 >> 11 & 0x1F);
-			float gPrev3 = (float)(rgbPrev3 >>  6 & 0x1F);
-			float bPrev3 = (float)(rgbPrev3       & 0x1F);
+                        float rPrev3 = (float)(rgbPrev3 >> 11 & 0x1F);
+                        float gPrev3 = (float)(rgbPrev3 >>  6 & 0x1F);
+                        float bPrev3 = (float)(rgbPrev3       & 0x1F);
 
-			float rPrev4 = (float)(rgbPrev4 >> 11 & 0x1F);
-			float gPrev4 = (float)(rgbPrev4 >>  6 & 0x1F);
-			float bPrev4 = (float)(rgbPrev4       & 0x1F);
+                        float rPrev4 = (float)(rgbPrev4 >> 11 & 0x1F);
+                        float gPrev4 = (float)(rgbPrev4 >>  6 & 0x1F);
+                        float bPrev4 = (float)(rgbPrev4       & 0x1F);
 
-			/* Mix colours for current frame and convert back to mColor
-			 * > Response time effect implemented via an exponential
-			 *   drop-off algorithm, taken from the 'Gameboy Classic Shader'
-			 *   by Harlequin:
-			 *      https://github.com/libretro/glsl-shaders/blob/master/handheld/shaders/gameboy/shader-files/gb-pass0.glsl */
-			rCurr += (rPrev1 - rCurr) * *response;
-			rCurr += (rPrev2 - rCurr) * *(response + 1);
-			rCurr += (rPrev3 - rCurr) * *(response + 2);
-			rCurr += (rPrev4 - rCurr) * *(response + 3);
-			mColor rMix = (mColor)(rCurr + 0.5f) & 0x1F;
+                        /* Mix colours for current frame and convert back to mColor
+                         * > Response time effect implemented via an exponential
+                         *   drop-off algorithm, taken from the 'Gameboy Classic Shader'
+                         *   by Harlequin:
+                         *      https://github.com/libretro/glsl-shaders/blob/master/handheld/shaders/gameboy/shader-files/gb-pass0.glsl */
+                        rCurr += (rPrev1 - rCurr) * *response;
+                        rCurr += (rPrev2 - rCurr) * *(response + 1);
+                        rCurr += (rPrev3 - rCurr) * *(response + 2);
+                        rCurr += (rPrev4 - rCurr) * *(response + 3);
+                        mColor rMix = (mColor)(rCurr + 0.5f) & 0x1F;
 
-			gCurr += (gPrev1 - gCurr) * *response;
-			gCurr += (gPrev2 - gCurr) * *(response + 1);
-			gCurr += (gPrev3 - gCurr) * *(response + 2);
-			gCurr += (gPrev4 - gCurr) * *(response + 3);
-			mColor gMix = (mColor)(gCurr + 0.5f) & 0x1F;
+                        gCurr += (gPrev1 - gCurr) * *response;
+                        gCurr += (gPrev2 - gCurr) * *(response + 1);
+                        gCurr += (gPrev3 - gCurr) * *(response + 2);
+                        gCurr += (gPrev4 - gCurr) * *(response + 3);
+                        mColor gMix = (mColor)(gCurr + 0.5f) & 0x1F;
 
-			bCurr += (bPrev1 - bCurr) * *response;
-			bCurr += (bPrev2 - bCurr) * *(response + 1);
-			bCurr += (bPrev3 - bCurr) * *(response + 2);
-			bCurr += (bPrev4 - bCurr) * *(response + 3);
-			mColor bMix = (mColor)(bCurr + 0.5f) & 0x1F;
+                        bCurr += (bPrev1 - bCurr) * *response;
+                        bCurr += (bPrev2 - bCurr) * *(response + 1);
+                        bCurr += (bPrev3 - bCurr) * *(response + 2);
+                        bCurr += (bPrev4 - bCurr) * *(response + 3);
+                        mColor bMix = (mColor)(bCurr + 0.5f) & 0x1F;
 
-			/* Repack colours for current frame */
-			*(dst + x) = colorCorrectionEnabled ?
-					*(ccLUT + (rMix << 11 | gMix << 6 | bMix)) :
-							rMix << 11 | gMix << 6 | bMix;
-		}
-		srcCurr  += VIDEO_WIDTH_MAX;
-		srcPrev1 += VIDEO_WIDTH_MAX;
-		srcPrev2 += VIDEO_WIDTH_MAX;
-		srcPrev3 += VIDEO_WIDTH_MAX;
-		srcPrev4 += VIDEO_WIDTH_MAX;
-		dst      += VIDEO_WIDTH_MAX;
-	}
+                        /* Repack colours for current frame */
+                        *(dst + x) = colorCorrectionEnabled ?
+                                        *(ccLUT + (rMix << 11 | gMix << 6 | bMix)) :
+                                                        rMix << 11 | gMix << 6 | bMix;
+                }
+                srcCurr  += VIDEO_WIDTH_MAX;
+                srcPrev1 += VIDEO_WIDTH_MAX;
+                srcPrev2 += VIDEO_WIDTH_MAX;
+                srcPrev3 += VIDEO_WIDTH_MAX;
+                srcPrev4 += VIDEO_WIDTH_MAX;
+                dst      += VIDEO_WIDTH_MAX;
+        }
 }
 
 static void videoPostProcessLcdGhostFast(unsigned width, unsigned height) {
 
-	mColor *srcCurr = outputBuffer;
-	float *srcPrevR = outputBufferAccR;
-	float *srcPrevG = outputBufferAccG;
-	float *srcPrevB = outputBufferAccB;
-	mColor *dst     = ppOutputBuffer;
-	size_t x, y;
+        mColor *srcCurr = outputBuffer;
+        float *srcPrevR = outputBufferAccR;
+        float *srcPrevG = outputBufferAccG;
+        float *srcPrevB = outputBufferAccB;
+        mColor *dst     = ppOutputBuffer;
+        size_t x, y;
 
-	for (y = 0; y < height; y++) {
-		for (x = 0; x < width; x++) {
+        for (y = 0; y < height; y++) {
+                for (x = 0; x < width; x++) {
 
-			/* Get colours from current + previous frames */
-			mColor rgbCurr = *(srcCurr + x);
-			float rPrev    = *(srcPrevR + x);
-			float gPrev    = *(srcPrevG + x);
-			float bPrev    = *(srcPrevB + x);
+                        /* Get colours from current + previous frames */
+                        mColor rgbCurr = *(srcCurr + x);
+                        float rPrev    = *(srcPrevR + x);
+                        float gPrev    = *(srcPrevG + x);
+                        float bPrev    = *(srcPrevB + x);
 
-			/* Unpack current colours and convert to float */
-			float rCurr = (float)(rgbCurr >> 11 & 0x1F);
-			float gCurr = (float)(rgbCurr >>  6 & 0x1F);
-			float bCurr = (float)(rgbCurr       & 0x1F);
+                        /* Unpack current colours and convert to float */
+                        float rCurr = (float)(rgbCurr >> 11 & 0x1F);
+                        float gCurr = (float)(rgbCurr >>  6 & 0x1F);
+                        float bCurr = (float)(rgbCurr       & 0x1F);
 
-			/* Mix colours for current frame */
-			float rMix = (rCurr * (1.0f - LCD_RESPONSE_TIME_FAKE)) + (LCD_RESPONSE_TIME_FAKE * rPrev);
-			float gMix = (gCurr * (1.0f - LCD_RESPONSE_TIME_FAKE)) + (LCD_RESPONSE_TIME_FAKE * gPrev);
-			float bMix = (bCurr * (1.0f - LCD_RESPONSE_TIME_FAKE)) + (LCD_RESPONSE_TIME_FAKE * bPrev);
+                        /* Mix colours for current frame */
+                        float rMix = (rCurr * (1.0f - LCD_RESPONSE_TIME_FAKE)) + (LCD_RESPONSE_TIME_FAKE * rPrev);
+                        float gMix = (gCurr * (1.0f - LCD_RESPONSE_TIME_FAKE)) + (LCD_RESPONSE_TIME_FAKE * gPrev);
+                        float bMix = (bCurr * (1.0f - LCD_RESPONSE_TIME_FAKE)) + (LCD_RESPONSE_TIME_FAKE * bPrev);
 
-			/* Store colours for next frame */
-			*(srcPrevR + x) = rMix;
-			*(srcPrevG + x) = gMix;
-			*(srcPrevB + x) = bMix;
+                        /* Store colours for next frame */
+                        *(srcPrevR + x) = rMix;
+                        *(srcPrevG + x) = gMix;
+                        *(srcPrevB + x) = bMix;
 
-			/* Convert and repack current frame colours */
-			mColor rgbMix =   ((mColor)(rMix + 0.5f) & 0x1F) << 11
-								  | ((mColor)(gMix + 0.5f) & 0x1F) << 6
-								  | ((mColor)(bMix + 0.5f) & 0x1F);
+                        /* Convert and repack current frame colours */
+                        mColor rgbMix =   ((mColor)(rMix + 0.5f) & 0x1F) << 11
+                                                                  | ((mColor)(gMix + 0.5f) & 0x1F) << 6
+                                                                  | ((mColor)(bMix + 0.5f) & 0x1F);
 
-			/* Assign colours for current frame */
-			*(dst + x) = colorCorrectionEnabled ?
-					*(ccLUT + rgbMix) : rgbMix;
-		}
-		srcCurr  += VIDEO_WIDTH_MAX;
-		srcPrevR += VIDEO_WIDTH_MAX;
-		srcPrevG += VIDEO_WIDTH_MAX;
-		srcPrevB += VIDEO_WIDTH_MAX;
-		dst      += VIDEO_WIDTH_MAX;
-	}
+                        /* Assign colours for current frame */
+                        *(dst + x) = colorCorrectionEnabled ?
+                                        *(ccLUT + rgbMix) : rgbMix;
+                }
+                srcCurr  += VIDEO_WIDTH_MAX;
+                srcPrevR += VIDEO_WIDTH_MAX;
+                srcPrevG += VIDEO_WIDTH_MAX;
+                srcPrevB += VIDEO_WIDTH_MAX;
+                dst      += VIDEO_WIDTH_MAX;
+        }
 }
 
 static void _initPostProcessing(void) {
 
-	/* Early return if all post processing elements
-	 * are disabled */
-	videoPostProcess = NULL;
-	if (!colorCorrectionEnabled && !frameBlendEnabled) {
-		return;
-	}
+        /* Early return if all post processing elements
+         * are disabled */
+        videoPostProcess = NULL;
+        if (!colorCorrectionEnabled && !frameBlendEnabled) {
+                return;
+        }
 
-	/* Allocate output buffer, if required */
-	if (!ppOutputBuffer) {
+        /* Allocate output buffer, if required */
+        if (!ppOutputBuffer) {
 #ifdef _3DS
-		ppOutputBuffer = linearMemAlign(VIDEO_BUFF_SIZE, 0x80);
+                ppOutputBuffer = linearMemAlign(VIDEO_BUFF_SIZE, 0x80);
 #else
-		ppOutputBuffer = malloc(VIDEO_BUFF_SIZE);
+                ppOutputBuffer = malloc(VIDEO_BUFF_SIZE);
 #endif
-		if (!ppOutputBuffer) {
-			return;
-		}
-		memset(ppOutputBuffer, 0xFFFF, VIDEO_BUFF_SIZE);
-	}
+                if (!ppOutputBuffer) {
+                        return;
+                }
+                memset(ppOutputBuffer, 0xFFFF, VIDEO_BUFF_SIZE);
+        }
 
-	/* Assign post processing function */
-	if (frameBlendEnabled) {
-		switch (frameBlendType) {
-			case FRAME_BLEND_MIX:
-				videoPostProcess = videoPostProcessMix;
-				return;
-			case FRAME_BLEND_MIX_SMART:
-				videoPostProcess = videoPostProcessMixSmart;
-				return;
-			case FRAME_BLEND_LCD_GHOSTING:
-				videoPostProcess = videoPostProcessLcdGhost;
-				return;
-			case FRAME_BLEND_LCD_GHOSTING_FAST:
-				videoPostProcess = videoPostProcessLcdGhostFast;
-				return;
-			case FRAME_BLEND_NONE:
-			default:
-				/* Cannot happen */
-				videoPostProcess = colorCorrectionEnabled ?
-						videoPostProcessCc : NULL;
-				return;
-		}
-	} else if (colorCorrectionEnabled) {
-		videoPostProcess = videoPostProcessCc;
-	}
+        /* Assign post processing function */
+        if (frameBlendEnabled) {
+                switch (frameBlendType) {
+                        case FRAME_BLEND_MIX:
+                                videoPostProcess = videoPostProcessMix;
+                                return;
+                        case FRAME_BLEND_MIX_SMART:
+                                videoPostProcess = videoPostProcessMixSmart;
+                                return;
+                        case FRAME_BLEND_LCD_GHOSTING:
+                                videoPostProcess = videoPostProcessLcdGhost;
+                                return;
+                        case FRAME_BLEND_LCD_GHOSTING_FAST:
+                                videoPostProcess = videoPostProcessLcdGhostFast;
+                                return;
+                        case FRAME_BLEND_NONE:
+                        default:
+                                /* Cannot happen */
+                                videoPostProcess = colorCorrectionEnabled ?
+                                                videoPostProcessCc : NULL;
+                                return;
+                }
+        } else if (colorCorrectionEnabled) {
+                videoPostProcess = videoPostProcessCc;
+        }
 }
 
 static void _loadPostProcessingSettings(void) {
 
-	/* Load settings and initialise individual
-	 * post processing elements */
-	_loadColorCorrectionSettings();
-	_loadFrameBlendSettings();
+        /* Load settings and initialise individual
+         * post processing elements */
+        _loadColorCorrectionSettings();
+        _loadFrameBlendSettings();
 
-	/* Initialise post processing buffers/functions
-	 * based on configured options */
-	_initPostProcessing();
+        /* Initialise post processing buffers/functions
+         * based on configured options */
+        _initPostProcessing();
 }
 
 static void _deinitPostProcessing(void) {
 
-	ccType                 = 0;
-	frameBlendType         = FRAME_BLEND_NONE;
-	colorCorrectionEnabled = false;
-	frameBlendEnabled      = false;
-	videoPostProcess       = NULL;
+        ccType                 = 0;
+        frameBlendType         = FRAME_BLEND_NONE;
+        colorCorrectionEnabled = false;
+        frameBlendEnabled      = false;
+        videoPostProcess       = NULL;
 
-	/* Free all allocated buffers */
-	if (ppOutputBuffer) {
+        /* Free all allocated buffers */
+        if (ppOutputBuffer) {
 #ifdef _3DS
-		linearFree(ppOutputBuffer);
+                linearFree(ppOutputBuffer);
 #else
-		free(ppOutputBuffer);
+                free(ppOutputBuffer);
 #endif
-		ppOutputBuffer = NULL;
-	}
+                ppOutputBuffer = NULL;
+        }
 
-	/* > Colour correction */
-	if (ccLUT) {
-		free(ccLUT);
-		ccLUT = NULL;
-	}
+        /* > Colour correction */
+        if (ccLUT) {
+                free(ccLUT);
+                ccLUT = NULL;
+        }
 
-	/* > Interframe blending */
-	if (outputBufferPrev1) {
-		free(outputBufferPrev1);
-		outputBufferPrev1 = NULL;
-	}
+        /* > Interframe blending */
+        if (outputBufferPrev1) {
+                free(outputBufferPrev1);
+                outputBufferPrev1 = NULL;
+        }
 
-	if (outputBufferPrev2) {
-		free(outputBufferPrev2);
-		outputBufferPrev2 = NULL;
-	}
+        if (outputBufferPrev2) {
+                free(outputBufferPrev2);
+                outputBufferPrev2 = NULL;
+        }
 
-	if (outputBufferPrev3) {
-		free(outputBufferPrev3);
-		outputBufferPrev3 = NULL;
-	}
+        if (outputBufferPrev3) {
+                free(outputBufferPrev3);
+                outputBufferPrev3 = NULL;
+        }
 
-	if (outputBufferPrev4) {
-		free(outputBufferPrev4);
-		outputBufferPrev4 = NULL;
-	}
+        if (outputBufferPrev4) {
+                free(outputBufferPrev4);
+                outputBufferPrev4 = NULL;
+        }
 
-	if (outputBufferAccR) {
-		free(outputBufferAccR);
-		outputBufferAccR = NULL;
-	}
+        if (outputBufferAccR) {
+                free(outputBufferAccR);
+                outputBufferAccR = NULL;
+        }
 
-	if (outputBufferAccG) {
-		free(outputBufferAccG);
-		outputBufferAccG = NULL;
-	}
+        if (outputBufferAccG) {
+                free(outputBufferAccG);
+                outputBufferAccG = NULL;
+        }
 
-	if (outputBufferAccB) {
-		free(outputBufferAccB);
-		outputBufferAccB = NULL;
-	}
+        if (outputBufferAccB) {
+                free(outputBufferAccB);
+                outputBufferAccB = NULL;
+        }
 }
 
 #endif
 
 static void _initSensors(void) {
-	if (sensorsInitDone) {
-		return;
-	}
+        if (sensorsInitDone) {
+                return;
+        }
 
-	struct retro_sensor_interface sensorInterface;
-	if (environCallback(RETRO_ENVIRONMENT_GET_SENSOR_INTERFACE, &sensorInterface)) {
-		sensorGetCallback = sensorInterface.get_sensor_input;
-		sensorStateCallback = sensorInterface.set_sensor_state;
+        struct retro_sensor_interface sensorInterface;
+        if (environCallback(RETRO_ENVIRONMENT_GET_SENSOR_INTERFACE, &sensorInterface)) {
+                sensorGetCallback = sensorInterface.get_sensor_input;
+                sensorStateCallback = sensorInterface.set_sensor_state;
 
-		if (sensorStateCallback && sensorGetCallback) {
-			if (sensorStateCallback(0, RETRO_SENSOR_ACCELEROMETER_ENABLE, EVENT_RATE)) {
-				tiltEnabled = true;
-			}
+                if (sensorStateCallback && sensorGetCallback) {
+                        if (sensorStateCallback(0, RETRO_SENSOR_ACCELEROMETER_ENABLE, EVENT_RATE)) {
+                                tiltEnabled = true;
+                        }
 
-			if (sensorStateCallback(0, RETRO_SENSOR_GYROSCOPE_ENABLE, EVENT_RATE)) {
-				gyroEnabled = true;
-			}
+                        if (sensorStateCallback(0, RETRO_SENSOR_GYROSCOPE_ENABLE, EVENT_RATE)) {
+                                gyroEnabled = true;
+                        }
 
-			if (sensorStateCallback(0, RETRO_SENSOR_ILLUMINANCE_ENABLE, EVENT_RATE)) {
-				luxSensorEnabled = true;
-			}
-		}
-	}
+                        if (sensorStateCallback(0, RETRO_SENSOR_ILLUMINANCE_ENABLE, EVENT_RATE)) {
+                                luxSensorEnabled = true;
+                        }
+                }
+        }
 
-	sensorsInitDone = true;
+        sensorsInitDone = true;
 }
 
 static void _initRumble(void) {
-	if (rumbleInitDone) {
-		return;
-	}
+        if (rumbleInitDone) {
+                return;
+        }
 
-	struct retro_rumble_interface rumbleInterface;
-	if (environCallback(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumbleInterface)) {
-		rumbleCallback = rumbleInterface.set_rumble_state;
-	}
+        struct retro_rumble_interface rumbleInterface;
+        if (environCallback(RETRO_ENVIRONMENT_GET_RUMBLE_INTERFACE, &rumbleInterface)) {
+                rumbleCallback = rumbleInterface.set_rumble_state;
+        }
 
-	rumbleInitDone = true;
+        rumbleInitDone = true;
 }
 
 #ifdef M_CORE_GB
 static void _updateGbPal(void) {
-	struct retro_variable var;
-	var.key = "mgba_gb_colors";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		const struct GBColorPreset* presets;
-		size_t listSize = GBColorPresetList(&presets);
-		size_t i;
-		for (i = 0; i < listSize; ++i) {
-			if (strcmp(presets[i].name, var.value) != 0) {
-				continue;
-			}
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[0]", presets[i].colors[0] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[1]", presets[i].colors[1] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[2]", presets[i].colors[2] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[3]", presets[i].colors[3] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[4]", presets[i].colors[4] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[5]", presets[i].colors[5] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[6]", presets[i].colors[6] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[7]", presets[i].colors[7] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[8]", presets[i].colors[8] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[9]", presets[i].colors[9] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[10]", presets[i].colors[10] & 0xFFFFFF);
-			mCoreConfigSetUIntValue(&core->config, "gb.pal[11]", presets[i].colors[11] & 0xFFFFFF);
-			core->reloadConfigOption(core, "gb.pal", NULL);
-			break;
-		}
-	}
+        struct retro_variable var;
+        var.key = "mgba_gb_colors";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                const struct GBColorPreset* presets;
+                size_t listSize = GBColorPresetList(&presets);
+                size_t i;
+                for (i = 0; i < listSize; ++i) {
+                        if (strcmp(presets[i].name, var.value) != 0) {
+                                continue;
+                        }
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[0]", presets[i].colors[0] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[1]", presets[i].colors[1] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[2]", presets[i].colors[2] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[3]", presets[i].colors[3] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[4]", presets[i].colors[4] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[5]", presets[i].colors[5] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[6]", presets[i].colors[6] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[7]", presets[i].colors[7] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[8]", presets[i].colors[8] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[9]", presets[i].colors[9] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[10]", presets[i].colors[10] & 0xFFFFFF);
+                        mCoreConfigSetUIntValue(&core->config, "gb.pal[11]", presets[i].colors[11] & 0xFFFFFF);
+                        core->reloadConfigOption(core, "gb.pal", NULL);
+                        break;
+                }
+        }
 }
 #endif
 
 static void _reloadSettings(void) {
-	struct mCoreOptions opts = {
-		.useBios = true,
-		.volume = 0x100,
-	};
+        struct mCoreOptions opts = {
+                .useBios = true,
+                .volume = 0x100,
+        };
 
-	struct retro_variable var;
+        struct retro_variable var;
 #ifdef M_CORE_GB
-	enum GBModel model;
-	const char* modelName;
+        enum GBModel model;
+        const char* modelName;
 
-	var.key = "mgba_gb_model";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		if (strcmp(var.value, "Game Boy") == 0) {
-			model = GB_MODEL_DMG;
-		} else if (strcmp(var.value, "Super Game Boy") == 0) {
-			model = GB_MODEL_SGB;
-		} else if (strcmp(var.value, "Game Boy Color") == 0) {
-			model = GB_MODEL_CGB;
-		} else if (strcmp(var.value, "Super Game Boy Color") == 0) {
-			model = GB_MODEL_SCGB;
-		} else if (strcmp(var.value, "Game Boy Advance") == 0) {
-			model = GB_MODEL_AGB;
-		} else {
-			model = GB_MODEL_AUTODETECT;
-		}
+        var.key = "mgba_gb_model";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                if (strcmp(var.value, "Game Boy") == 0) {
+                        model = GB_MODEL_DMG;
+                } else if (strcmp(var.value, "Super Game Boy") == 0) {
+                        model = GB_MODEL_SGB;
+                } else if (strcmp(var.value, "Game Boy Color") == 0) {
+                        model = GB_MODEL_CGB;
+                } else if (strcmp(var.value, "Super Game Boy Color") == 0) {
+                        model = GB_MODEL_SCGB;
+                } else if (strcmp(var.value, "Game Boy Advance") == 0) {
+                        model = GB_MODEL_AGB;
+                } else {
+                        model = GB_MODEL_AUTODETECT;
+                }
 
-		modelName = GBModelToName(model);
-		mCoreConfigSetDefaultValue(&core->config, "gb.model", modelName);
-		mCoreConfigSetDefaultValue(&core->config, "sgb.model", modelName);
-		mCoreConfigSetDefaultValue(&core->config, "cgb.model", modelName);
-		mCoreConfigSetDefaultValue(&core->config, "cgb.hybridModel", modelName);
-		mCoreConfigSetDefaultValue(&core->config, "cgb.sgbModel", modelName);
-	}
+                modelName = GBModelToName(model);
+                mCoreConfigSetDefaultValue(&core->config, "gb.model", modelName);
+                mCoreConfigSetDefaultValue(&core->config, "sgb.model", modelName);
+                mCoreConfigSetDefaultValue(&core->config, "cgb.model", modelName);
+                mCoreConfigSetDefaultValue(&core->config, "cgb.hybridModel", modelName);
+                mCoreConfigSetDefaultValue(&core->config, "cgb.sgbModel", modelName);
+        }
 
-	var.key = "mgba_sgb_borders";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		mCoreConfigSetDefaultIntValue(&core->config, "sgb.borders", strcmp(var.value, "ON") == 0);
-	}
+        var.key = "mgba_sgb_borders";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                mCoreConfigSetDefaultIntValue(&core->config, "sgb.borders", strcmp(var.value, "ON") == 0);
+        }
 
-	var.key = "mgba_gb_colors_preset";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		mCoreConfigSetDefaultIntValue(&core->config, "gb.colors", strtol(var.value, NULL, 10));
-	}
+        var.key = "mgba_gb_colors_preset";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                mCoreConfigSetDefaultIntValue(&core->config, "gb.colors", strtol(var.value, NULL, 10));
+        }
 
-	_updateGbPal();
+        _updateGbPal();
 #endif
 
-	var.key = "mgba_use_bios";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		opts.useBios = strcmp(var.value, "ON") == 0;
-	}
+        var.key = "mgba_use_bios";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                opts.useBios = strcmp(var.value, "ON") == 0;
+        }
 
-	var.key = "mgba_skip_bios";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		opts.skipBios = strcmp(var.value, "ON") == 0;
-	}
+        var.key = "mgba_skip_bios";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                opts.skipBios = strcmp(var.value, "ON") == 0;
+        }
 
 #ifdef M_CORE_GB
-	var.key = "mgba_sgb_borders";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		mCoreConfigSetDefaultIntValue(&core->config, "sgb.borders", strcmp(var.value, "ON") == 0);
-	}
+        var.key = "mgba_sgb_borders";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                mCoreConfigSetDefaultIntValue(&core->config, "sgb.borders", strcmp(var.value, "ON") == 0);
+        }
 #endif
 
-	_loadFrameskipSettings(&opts);
-	_loadAudioLowPassFilterSettings();
+        _loadFrameskipSettings(&opts);
+        _loadAudioLowPassFilterSettings();
 
-	var.key = "mgba_idle_optimization";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		if (strcmp(var.value, "Don't Remove") == 0) {
-			mCoreConfigSetDefaultValue(&core->config, "idleOptimization", "ignore");
-		} else if (strcmp(var.value, "Remove Known") == 0) {
-			mCoreConfigSetDefaultValue(&core->config, "idleOptimization", "remove");
-		} else if (strcmp(var.value, "Detect and Remove") == 0) {
-			mCoreConfigSetDefaultValue(&core->config, "idleOptimization", "detect");
-		}
-	}
+        var.key = "mgba_idle_optimization";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                if (strcmp(var.value, "Don't Remove") == 0) {
+                        mCoreConfigSetDefaultValue(&core->config, "idleOptimization", "ignore");
+                } else if (strcmp(var.value, "Remove Known") == 0) {
+                        mCoreConfigSetDefaultValue(&core->config, "idleOptimization", "remove");
+                } else if (strcmp(var.value, "Detect and Remove") == 0) {
+                        mCoreConfigSetDefaultValue(&core->config, "idleOptimization", "detect");
+                }
+        }
 
 #ifdef M_CORE_GBA
-	var.key = "mgba_force_gbp";
-	var.value = 0;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-		mCoreConfigSetDefaultIntValue(&core->config, "gba.forceGbp", strcmp(var.value, "ON") == 0);
-	}
+        var.key = "mgba_force_gbp";
+        var.value = 0;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                mCoreConfigSetDefaultIntValue(&core->config, "gba.forceGbp", strcmp(var.value, "ON") == 0);
+        }
 #endif
 
-	mCoreConfigLoadDefaults(&core->config, &opts);
-	mCoreLoadConfig(core);
+        mCoreConfigLoadDefaults(&core->config, &opts);
+        mCoreLoadConfig(core);
 }
 
 static void _doDeferredSetup(void) {
-	// Libretro API doesn't let you know when it's done copying data into the save buffers.
-	// On the off-hand chance that a core actually expects its buffers to be populated when
-	// you actually first get them, you're out of luck without workarounds. Yup, seriously.
-	// Here's that workaround, but really the API needs to be thrown out and rewritten.
-	struct VFile* save = VFileFromMemory(savedata, GBA_SIZE_FLASH1M);
+        // Libretro API doesn't let you know when it's done copying data into the save buffers.
+        // On the off-hand chance that a core actually expects its buffers to be populated when
+        // you actually first get them, you're out of luck without workarounds. Yup, seriously.
+        // Here's that workaround, but really the API needs to be thrown out and rewritten.
+        struct VFile* save = VFileFromMemory(savedata, GBA_SIZE_FLASH1M);
 
     /* need to defer resetting the core on start so drivers are initialized */
     core->reset(core);
-	_setupMaps(core);
+        _setupMaps(core);
 
 #if defined(COLOR_16_BIT) && defined(COLOR_5_6_5)
-	_loadPostProcessingSettings();
+        _loadPostProcessingSettings();
 #endif
 
-	if (!core->loadSave(core, save)) {
-		save->close(save);
-	}
-	deferredSetup = false;
+        if (!core->loadSave(core, save)) {
+                save->close(save);
+        }
+        deferredSetup = false;
 }
 
 unsigned retro_api_version(void) {
-	return RETRO_API_VERSION;
+        return RETRO_API_VERSION;
 }
 
 void retro_set_environment(retro_environment_t env)
 {
-	environCallback = env;
+        environCallback = env;
 
 #ifdef M_CORE_GB
-	const struct GBColorPreset* presets;
-	size_t listSize = GBColorPresetList(&presets);
+        const struct GBColorPreset* presets;
+        size_t listSize = GBColorPresetList(&presets);
 
-	size_t colorOpt;
-	for (colorOpt = 0; option_defs_us[colorOpt].key; ++colorOpt) {
-		if (strcmp(option_defs_us[colorOpt].key, "mgba_gb_colors") == 0) {
-			break;
-		}
-	}
-	size_t i;
-	for (i = 0; i < listSize && i < RETRO_NUM_CORE_OPTION_VALUES_MAX; ++i) {
-		option_defs_us[colorOpt].values[i].value = presets[i].name;
-	}
+        size_t colorOpt;
+        for (colorOpt = 0; option_defs_us[colorOpt].key; ++colorOpt) {
+                if (strcmp(option_defs_us[colorOpt].key, "mgba_gb_colors") == 0) {
+                        break;
+                }
+        }
+        size_t i;
+        for (i = 0; i < listSize && i < RETRO_NUM_CORE_OPTION_VALUES_MAX; ++i) {
+                option_defs_us[colorOpt].values[i].value = presets[i].name;
+        }
 #endif
 
-	bool categoriesSupported;
-	libretro_set_core_options(environCallback, &categoriesSupported);
+        bool categoriesSupported;
+        libretro_set_core_options(environCallback, &categoriesSupported);
 }
 
 void retro_set_video_refresh(retro_video_refresh_t video) {
-	videoCallback = video;
+        videoCallback = video;
 }
 
 void retro_set_audio_sample(retro_audio_sample_t audio) {
-	UNUSED(audio);
+        UNUSED(audio);
 }
 
 void retro_set_audio_sample_batch(retro_audio_sample_batch_t audioBatch) {
-	audioCallback = audioBatch;
+        audioCallback = audioBatch;
 }
 
 void retro_set_input_poll(retro_input_poll_t inputPoll) {
-	inputPollCallback = inputPoll;
+        inputPollCallback = inputPoll;
 }
 
 void retro_set_input_state(retro_input_state_t input) {
-	inputCallback = input;
+        inputCallback = input;
 }
 
 void retro_get_system_info(struct retro_system_info* info) {
 #ifdef GEKKO
-	info->need_fullpath = true;
+        info->need_fullpath = true;
 #else
-	info->need_fullpath = false;
+        info->need_fullpath = false;
 #endif
 #ifdef M_CORE_GB
-	info->valid_extensions = "gba|gb|gbc|sgb";
+        info->valid_extensions = "gba|gb|gbc|sgb";
 #else
-	info->valid_extensions = "gba";
+        info->valid_extensions = "gba";
 #endif
-	info->library_version = projectVersion;
-	info->library_name = projectName;
-	info->block_extract = false;
+        info->library_version = projectVersion;
+        info->library_name = projectName;
+        info->block_extract = false;
 }
 
 void retro_get_system_av_info(struct retro_system_av_info* info) {
-	unsigned width, height;
-	core->currentVideoSize(core, &width, &height);
-	info->geometry.base_width = width;
-	info->geometry.base_height = height;
+        unsigned width, height;
+        core->currentVideoSize(core, &width, &height);
+        info->geometry.base_width = width;
+        info->geometry.base_height = height;
 
-	core->baseVideoSize(core, &width, &height);
-	info->geometry.max_width = width;
-	info->geometry.max_height = height;
+        core->baseVideoSize(core, &width, &height);
+        info->geometry.max_width = width;
+        info->geometry.max_height = height;
 
-	info->geometry.aspect_ratio = width / (double) height;
-	info->timing.fps = core->frequency(core) / (float) core->frameCycles(core);
+        info->geometry.aspect_ratio = width / (double) height;
+        info->timing.fps = core->frequency(core) / (float) core->frameCycles(core);
 
 #ifdef M_CORE_GBA
-	if (core->platform(core) == mPLATFORM_GBA) {
-		info->timing.sample_rate = targetSampleRate;
-	} else {
+        if (core->platform(core) == mPLATFORM_GBA) {
+                info->timing.sample_rate = targetSampleRate;
+        } else {
 #endif
-		info->timing.sample_rate = core->audioSampleRate(core);
+                info->timing.sample_rate = core->audioSampleRate(core);
 #ifdef M_CORE_GBA
-	}
+        }
 #endif
 }
 
 void retro_init(void) {
-	enum retro_pixel_format fmt;
+        enum retro_pixel_format fmt;
 #ifdef COLOR_16_BIT
 #if defined(COLOR_5_6_5) || defined(PS2)
-	fmt = RETRO_PIXEL_FORMAT_RGB565;
+        fmt = RETRO_PIXEL_FORMAT_RGB565;
 #else
 #warning This pixel format is unsupported. Please use -DCOLOR_16-BIT -DCOLOR_5_6_5
-	fmt = RETRO_PIXEL_FORMAT_0RGB1555;
+        fmt = RETRO_PIXEL_FORMAT_0RGB1555;
 #endif
 #else
 #warning This pixel format is unsupported. Please use -DCOLOR_16-BIT -DCOLOR_5_6_5
-	fmt = RETRO_PIXEL_FORMAT_XRGB8888;
+        fmt = RETRO_PIXEL_FORMAT_XRGB8888;
 #endif
-	environCallback(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt);
+        environCallback(RETRO_ENVIRONMENT_SET_PIXEL_FORMAT, &fmt);
 
-	struct retro_input_descriptor inputDescriptors[] = {
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A, "A" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B, "B" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X, "Turbo A" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y, "Turbo B" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT, "Left" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "Up" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN, "Down" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R, "R" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L, "L" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2, "Turbo R" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2, "Turbo L" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3, "Brighten Solar Sensor" },
-		{ 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3, "Darken Solar Sensor" },
-		{ 0 }
-	};
-	environCallback(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, &inputDescriptors);
+        struct retro_input_descriptor inputDescriptors[] = {
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_A, "A" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_B, "B" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X, "Turbo A" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y, "Turbo B" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_SELECT, "Select" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_START, "Start" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_RIGHT, "Right" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_LEFT, "Left" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_UP, "Up" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_DOWN, "Down" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R, "R" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L, "L" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2, "Turbo R" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2, "Turbo L" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3, "Brighten Solar Sensor" },
+                { 0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3, "Darken Solar Sensor" },
+                { 0 }
+        };
+        environCallback(RETRO_ENVIRONMENT_SET_INPUT_DESCRIPTORS, &inputDescriptors);
 
-	useBitmasks = environCallback(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL);
+        useBitmasks = environCallback(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL);
 
-	// TODO: RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME when BIOS booting is supported
+        // TODO: RETRO_ENVIRONMENT_SET_SUPPORT_NO_GAME when BIOS booting is supported
 
-	rumbleInitDone = false;
-	mRumbleIntegratorInit(&rumble);
-	rumble.setRumble = _setRumble;
-	rumbleCallback = 0;
+        rumbleInitDone = false;
+        mRumbleIntegratorInit(&rumble);
+        rumble.setRumble = _setRumble;
+        rumbleCallback = 0;
 
-	sensorsInitDone = false;
-	sensorGetCallback = 0;
-	sensorStateCallback = 0;
+        sensorsInitDone = false;
+        sensorGetCallback = 0;
+        sensorStateCallback = 0;
 
-	tiltEnabled = false;
-	gyroEnabled = false;
-	rotation.sample = _updateRotation;
-	rotation.readTiltX = _readTiltX;
-	rotation.readTiltY = _readTiltY;
-	rotation.readGyroZ = _readGyroZ;
+        tiltEnabled = false;
+        gyroEnabled = false;
+        rotation.sample = _updateRotation;
+        rotation.readTiltX = _readTiltX;
+        rotation.readTiltY = _readTiltY;
+        rotation.readGyroZ = _readGyroZ;
 
-	envVarsUpdated = true;
-	luxSensorUsed = false;
-	luxSensorEnabled = false;
-	luxLevelIndex = 0;
-	luxLevel = 0;
-	lux.readLuminance = _readLux;
-	lux.sample = _updateLux;
-	_updateLux(&lux);
+        envVarsUpdated = true;
+        luxSensorUsed = false;
+        luxSensorEnabled = false;
+        luxLevelIndex = 0;
+        luxLevel = 0;
+        lux.readLuminance = _readLux;
+        lux.sample = _updateLux;
+        _updateLux(&lux);
 
-	struct retro_log_callback log;
-	if (environCallback(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log)) {
-		logCallback = log.log;
-	} else {
-		logCallback = 0;
-	}
-	logger.log = GBARetroLog;
-	mLogSetDefaultLogger(&logger);
+        struct retro_log_callback log;
+        if (environCallback(RETRO_ENVIRONMENT_GET_LOG_INTERFACE, &log)) {
+                logCallback = log.log;
+        } else {
+                logCallback = 0;
+        }
+        logger.log = GBARetroLog;
+        mLogSetDefaultLogger(&logger);
 
-	stream.videoDimensionsChanged = NULL;
-	stream.postAudioFrame = NULL;
-	stream.postAudioBuffer = NULL;
-	stream.postVideoFrame = NULL;
-	stream.audioRateChanged = _audioRateChanged;
+        stream.videoDimensionsChanged = NULL;
+        stream.postAudioFrame = NULL;
+        stream.postAudioBuffer = NULL;
+        stream.postVideoFrame = NULL;
+        stream.audioRateChanged = _audioRateChanged;
 
-	imageSource.startRequestImage = _startImage;
-	imageSource.stopRequestImage = _stopImage;
-	imageSource.requestImage = _requestImage;
+        imageSource.startRequestImage = _startImage;
+        imageSource.stopRequestImage = _stopImage;
+        imageSource.requestImage = _requestImage;
 
-	if (environCallback(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
-		libretro_supports_bitmasks = true;
+        if (environCallback(RETRO_ENVIRONMENT_GET_INPUT_BITMASKS, NULL))
+                libretro_supports_bitmasks = true;
 
-	frameskipType           = 0;
-	frameskipThreshold      = 0;
-	frameskipCounter        = 0;
-	retroAudioBuffActive    = false;
-	retroAudioBuffOccupancy = 0;
-	retroAudioBuffUnderrun  = false;
-	retroAudioLatency       = 0;
-	updateAudioLatency      = false;
-	updateAudioRate         = false;
+        frameskipType           = 0;
+        frameskipThreshold      = 0;
+        frameskipCounter        = 0;
+        retroAudioBuffActive    = false;
+        retroAudioBuffOccupancy = 0;
+        retroAudioBuffUnderrun  = false;
+        retroAudioLatency       = 0;
+        updateAudioLatency      = false;
+        updateAudioRate         = false;
 }
 
 void retro_deinit(void) {
-	if (outputBuffer) {
+        if (outputBuffer) {
 #ifdef _3DS
-		linearFree(outputBuffer);
+                linearFree(outputBuffer);
 #else
-		free(outputBuffer);
+                free(outputBuffer);
 #endif
-		outputBuffer = NULL;
-	}
+                outputBuffer = NULL;
+        }
 #if defined(COLOR_16_BIT) && defined(COLOR_5_6_5)
-	_deinitPostProcessing();
+        _deinitPostProcessing();
 #endif
 
-	mAudioBufferDeinit(&audioResampleBuffer);
-	mAudioResamplerDeinit(&audioResampler);
+        mAudioBufferDeinit(&audioResampleBuffer);
+        mAudioResamplerDeinit(&audioResampler);
 
-	if (audioSampleBuffer) {
-		free(audioSampleBuffer);
-		audioSampleBuffer = NULL;
-	}
-	audioSampleBufferSize = 0;
+        if (audioSampleBuffer) {
+                free(audioSampleBuffer);
+                audioSampleBuffer = NULL;
+        }
+        audioSampleBufferSize = 0;
 
-	if (sensorStateCallback) {
-		sensorStateCallback(0, RETRO_SENSOR_ACCELEROMETER_DISABLE, EVENT_RATE);
-		sensorStateCallback(0, RETRO_SENSOR_GYROSCOPE_DISABLE, EVENT_RATE);
-		sensorStateCallback(0, RETRO_SENSOR_ILLUMINANCE_DISABLE, EVENT_RATE);
-		sensorGetCallback = NULL;
-		sensorStateCallback = NULL;
-	}
+        if (sensorStateCallback) {
+                sensorStateCallback(0, RETRO_SENSOR_ACCELEROMETER_DISABLE, EVENT_RATE);
+                sensorStateCallback(0, RETRO_SENSOR_GYROSCOPE_DISABLE, EVENT_RATE);
+                sensorStateCallback(0, RETRO_SENSOR_ILLUMINANCE_DISABLE, EVENT_RATE);
+                sensorGetCallback = NULL;
+                sensorStateCallback = NULL;
+        }
 
-	tiltEnabled = false;
-	gyroEnabled = false;
-	luxSensorEnabled = false;
-	sensorsInitDone = false;
-	useBitmasks = false;
+        tiltEnabled = false;
+        gyroEnabled = false;
+        luxSensorEnabled = false;
+        sensorsInitDone = false;
+        useBitmasks = false;
 
-	audioLowPassEnabled = false;
-	audioLowPassRange = 0;
-	audioLowPassLeftPrev = 0;
-	audioLowPassRightPrev = 0;
+        audioLowPassEnabled = false;
+        audioLowPassRange = 0;
+        audioLowPassLeftPrev = 0;
+        audioLowPassRightPrev = 0;
 }
 
 static int turboclock = 0;
 static bool indownstate = true;
 
 int16_t cycleturbo(bool a, bool b, bool l, bool r) {
-	int16_t buttons = 0;
-	turboclock++;
-	if (turboclock >= 2) {
-		turboclock = 0;
-		indownstate = !indownstate;
-	}
+        int16_t buttons = 0;
+        turboclock++;
+        if (turboclock >= 2) {
+                turboclock = 0;
+                indownstate = !indownstate;
+        }
 
-	if (a) {
-		buttons |= indownstate << 0;
-	}
+        if (a) {
+                buttons |= indownstate << 0;
+        }
 
-	if (b) {
-		buttons |= indownstate << 1;
-	}
+        if (b) {
+                buttons |= indownstate << 1;
+        }
 
-	if (l) {
-		buttons |= indownstate << 9;
-	}
+        if (l) {
+                buttons |= indownstate << 9;
+        }
 
-	if (r) {
-		buttons |= indownstate << 8;
-	}
+        if (r) {
+                buttons |= indownstate << 8;
+        }
 
-	return buttons;
+        return buttons;
 }
 
+/* ---- Config-driven auto-load save state (cross-platform) ------------ *
+ * On the first frame after a ROM loads, the core reads a config file that
+ * sits next to it and is named after it: e.g. "mgba_libretro.cfg" beside
+ * "mgba_libretro.dll" (Windows) or "mgba_libretro_android.cfg" beside
+ * "mgba_libretro_android.so" (Android). If enabled, it loads:
+ *
+ *     <save_path>/<rom-name-without-extension>.<state_ext>
+ *
+ * Example config (mgba_libretro.cfg):
+ *     enabled   = 1
+ *     save_path = G:\RetroBat\saves\gba\libretro.mgba
+ *     state_ext = state.auto
+ *
+ * A line "[autoload] ..." is written both to the RetroArch log and to
+ * "autoload.log" beside the core, so problems are easy to diagnose.       */
+
+#include <stdio.h>
+#include <stdarg.h>
+#include <string.h>
+#include <time.h>
+
+#ifdef _WIN32
+/* mGBA's mgba-util/common.h already includes <windows.h> via winsock2.h,
+ * so GetModuleHandleExA and GetModuleFileNameA are already declared.
+ * No manual declarations needed. */
+#define AUTOLOAD_STRCASECMP _stricmp
+#define AUTOLOAD_MAX_PATH   MAX_PATH
+#define AUTOLOAD_PATH_SEP   '\\'
+#else
+#include <dlfcn.h>
+#include <strings.h>
+#define AUTOLOAD_STRCASECMP strcasecmp
+#define AUTOLOAD_MAX_PATH   4096
+#define AUTOLOAD_PATH_SEP   '/'
+#endif
+
+#define AUTOLOAD_MAX_RUNS  25   /* keep only the latest N runs in autoload.log */
+#define AUTOLOAD_MAX_PATHS 16   /* max number of save_path entries in the config */
+
+static bool autoload_state_pending      = false;
+static char autoload_dir[AUTOLOAD_MAX_PATH]      = {0};   /* folder the core lives in */
+static char autoload_rom_path[AUTOLOAD_MAX_PATH]  = {0};   /* full path of the loaded ROM   */
+static char autoload_core_name[64]      = {0};   /* this core's file name, no ext */
+
+/* Directory that THIS core (.dll/.so/.dylib) lives in. */
+static void autoload_get_self_dir(char *out, size_t out_size)
+{
+        out[0] = '\0';
+#ifdef _WIN32
+        HMODULE hm = NULL;
+        char path[AUTOLOAD_MAX_PATH];
+        char *slash;
+        if (!GetModuleHandleExA(
+              GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+              GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+              (LPCSTR)&autoload_get_self_dir, &hm))
+                return;
+        if (!GetModuleFileNameA(hm, path, sizeof(path)))
+                return;
+        slash = strrchr(path, '\\');
+        if (slash) *slash = '\0';
+        strncpy(out, path, out_size - 1);
+        out[out_size - 1] = '\0';
+#else
+        Dl_info info;
+        if (dladdr((const void *)&autoload_get_self_dir, &info) && info.dli_fname)
+        {
+                char *slash;
+                strncpy(out, info.dli_fname, out_size - 1);
+                out[out_size - 1] = '\0';
+                slash = strrchr(out, '/');
+                if (slash) *slash = '\0';
+        }
+#endif
+}
+
+/* This core's own file name, without directory or extension
+ * (e.g. "mgba_libretro" or "mgba_libretro_android"). */
+static void autoload_get_self_name(char *out, size_t out_size)
+{
+        out[0] = '\0';
+#ifdef _WIN32
+        HMODULE hm = NULL;
+        char path[AUTOLOAD_MAX_PATH];
+        char *slash, *dot, *base;
+        if (!GetModuleHandleExA(
+              GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS |
+              GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,
+              (LPCSTR)&autoload_get_self_name, &hm))
+                return;
+        if (!GetModuleFileNameA(hm, path, sizeof(path)))
+                return;
+        slash = strrchr(path, '\\');
+        base  = slash ? slash + 1 : path;
+        strncpy(out, base, out_size - 1);
+        out[out_size - 1] = '\0';
+        dot = strrchr(out, '.');
+        if (dot) *dot = '\0';
+#else
+        Dl_info info;
+        if (dladdr((const void *)&autoload_get_self_name, &info) && info.dli_fname)
+        {
+                char *slash, *dot, *base;
+                strncpy(out, info.dli_fname, out_size - 1);
+                out[out_size - 1] = '\0';
+                slash = strrchr(out, '/');
+                base  = slash ? slash + 1 : out;
+                if (base != out) memmove(out, base, strlen(base) + 1);
+                dot = strrchr(out, '.');
+                if (dot) *dot = '\0';
+        }
+#endif
+}
+
+/* Build the config file path: <core_dir>/<core_name_without_ext>.cfg */
+static void autoload_get_self_cfg(char *out, size_t out_size)
+{
+        char name[64];
+        out[0] = '\0';
+        autoload_get_self_name(name, sizeof(name));
+        if (name[0] == '\0')
+                return;
+        if (autoload_dir[0] != '\0')
+                snprintf(out, out_size, "%s%c%s.cfg", autoload_dir, AUTOLOAD_PATH_SEP, name);
+        else
+                snprintf(out, out_size, "%s.cfg", name);
+}
+
+/* Write a line to autoload.log next to the core AND to the RetroArch log. */
+static void autoload_logf(const char *fmt, ...)
+{
+        char    line[1024];
+        va_list ap;
+        va_start(ap, fmt);
+        vsnprintf(line, sizeof(line), fmt, ap);
+        va_end(ap);
+
+        if (logCallback)
+                logCallback(RETRO_LOG_INFO, "[autoload] %s\n", line);
+
+        if (autoload_dir[0] != '\0')
+        {
+                char logpath[AUTOLOAD_MAX_PATH + 32];
+                FILE *fp;
+                snprintf(logpath, sizeof(logpath), "%s%cautoload.log", autoload_dir, AUTOLOAD_PATH_SEP);
+                fp = fopen(logpath, "a");
+                if (fp) { fprintf(fp, "%s\n", line); fclose(fp); }
+        }
+}
+
+/* Trim autoload.log so it keeps only the most recent `keep_runs` runs.
+ * Runs are delimited by lines beginning with "--- autoload run ---". */
+static void autoload_log_rotate(int keep_runs)
+{
+        char        logpath[AUTOLOAD_MAX_PATH + 32];
+        const char *marker = "--- autoload run ---";
+        FILE       *fp;
+        long        fsize;
+        char       *data, *p, *cut;
+        int         count = 0, seen = 0;
+        size_t      got;
+
+        if (autoload_dir[0] == '\0')
+                return;
+        snprintf(logpath, sizeof(logpath), "%s%cautoload.log", autoload_dir, AUTOLOAD_PATH_SEP);
+
+        fp = fopen(logpath, "rb");
+        if (!fp)
+                return;                       /* no log yet */
+        fseek(fp, 0, SEEK_END);
+        fsize = ftell(fp);
+        fseek(fp, 0, SEEK_SET);
+        if (fsize <= 0) { fclose(fp); return; }
+        data = (char*)malloc((size_t)fsize + 1);
+        if (!data) { fclose(fp); return; }
+        got = fread(data, 1, (size_t)fsize, fp);
+        data[got] = '\0';
+        fclose(fp);
+
+        p = data;
+        while ((p = strstr(p, marker)) != NULL) { count++; p += 1; }
+
+        if (count > keep_runs)
+        {
+                int drop = count - keep_runs; /* leading runs to remove */
+                cut = data;
+                p   = data;
+                while ((p = strstr(p, marker)) != NULL)
+                {
+                        if (++seen == drop + 1) { cut = p; break; }
+                        p += 1;
+                }
+                fp = fopen(logpath, "wb");
+                if (fp) { fwrite(cut, 1, strlen(cut), fp); fclose(fp); }
+        }
+        free(data);
+}
+
+/* ---- tiny "key = value" config parser ------------------------------- */
+typedef struct
+{
+        bool enabled;
+        int  num_paths;
+        char save_paths[AUTOLOAD_MAX_PATHS][AUTOLOAD_MAX_PATH];
+        char state_ext[64];
+} autoload_config;
+
+static void autoload_trim(char *s)
+{
+        size_t len;
+        char  *start = s;
+        while (*start == ' ' || *start == '\t') start++;
+        if (start != s) memmove(s, start, strlen(start) + 1);
+        len = strlen(s);
+        while (len > 0 && (s[len-1] == '\r' || s[len-1] == '\n' ||
+                           s[len-1] == ' '  || s[len-1] == '\t'))
+                s[--len] = '\0';
+}
+
+static bool autoload_read_config(const char *cfg_path, autoload_config *cfg)
+{
+        FILE *fp;
+        char  line[1024];
+
+        cfg->enabled      = false;
+        cfg->num_paths    = 0;
+        strcpy(cfg->state_ext, "state.auto");   /* default extension */
+
+        fp = fopen(cfg_path, "r");
+        if (!fp)
+                return false;
+
+        while (fgets(line, sizeof(line), fp))
+        {
+                char *eq, *key, *val;
+                if (line[0] == '#' || line[0] == ';')
+                        continue;
+                eq = strchr(line, '=');
+                if (!eq)
+                        continue;
+                *eq = '\0';
+                key = line;
+                val = eq + 1;
+                autoload_trim(key);
+                autoload_trim(val);
+
+                if (AUTOLOAD_STRCASECMP(key, "enabled") == 0)
+                        cfg->enabled = (AUTOLOAD_STRCASECMP(val, "1")    == 0 ||
+                                        AUTOLOAD_STRCASECMP(val, "true") == 0 ||
+                                        AUTOLOAD_STRCASECMP(val, "yes")  == 0 ||
+                                        AUTOLOAD_STRCASECMP(val, "on")   == 0);
+                else if (AUTOLOAD_STRCASECMP(key, "save_path") == 0)
+                {
+                        if (cfg->num_paths < AUTOLOAD_MAX_PATHS && *val)
+                        {
+                                strncpy(cfg->save_paths[cfg->num_paths], val, AUTOLOAD_MAX_PATH - 1);
+                                cfg->save_paths[cfg->num_paths][AUTOLOAD_MAX_PATH - 1] = '\0';
+                                cfg->num_paths++;
+                        }
+                }
+                else if (AUTOLOAD_STRCASECMP(key, "state_ext") == 0)
+                {
+                        if (*val == '.') val++;            /* accept "state" or ".state" */
+                        if (*val)
+                        {
+                                strncpy(cfg->state_ext, val, sizeof(cfg->state_ext) - 1);
+                                cfg->state_ext[sizeof(cfg->state_ext) - 1] = '\0';
+                        }
+                }
+        }
+        fclose(fp);
+        return true;
+}
+
+/* ROM file name, without directory and without extension.
+ * Handles archive content where the frontend passes the path as
+ * "<archive>.zip#<inner-file>.gba" - we use the inner file name. */
+static void autoload_rom_basename(char *out, size_t out_size)
+{
+        const char *p    = autoload_rom_path;
+        const char *hash = strrchr(p, '#');   /* archive separator, if any */
+        const char *base, *s1, *s2;
+        char *dot;
+
+        if (hash)
+                p = hash + 1;                       /* skip "<archive>.zip#" */
+
+        base = p;
+        s1   = strrchr(p, '\\');
+        s2   = strrchr(p, '/');
+        if (s1 && (!s2 || s1 > s2)) base = s1 + 1;
+        else if (s2)                base = s2 + 1;
+
+        strncpy(out, base, out_size - 1);
+        out[out_size - 1] = '\0';
+        dot = strrchr(out, '.');
+        if (dot) *dot = '\0';
+}
+
+/* RetroArch wraps states in a "RASTATE" container; the real data is in the
+ * "MEM " block. Returns true (and points at the MEM block) if it's a
+ * container, false to treat the file as a raw state. */
+static bool autoload_extract_rastate(const uint8_t *file, size_t file_len,
+                                     const uint8_t **out_data, size_t *out_size)
+{
+        size_t pos;
+        if (file_len < 8 || memcmp(file, "RASTATE", 7) != 0)
+                return false;
+        pos = 8;
+        while (pos + 8 <= file_len)
+        {
+                const uint8_t *p = file + pos;
+                uint32_t blocksize =  (uint32_t)p[4]
+                                   | ((uint32_t)p[5] << 8)
+                                   | ((uint32_t)p[6] << 16)
+                                   | ((uint32_t)p[7] << 24);
+                pos += 8;
+                if (memcmp(p, "MEM ", 4) == 0)
+                {
+                        if (pos + blocksize > file_len) return false;
+                        *out_data = file + pos;
+                        *out_size = (size_t)blocksize;
+                        return true;
+                }
+                if (memcmp(p, "END ", 4) == 0)
+                        break;
+                pos += blocksize;
+        }
+        return false;
+}
+
+static void autoload_try_load_state(void)
+{
+        autoload_config cfg;
+        char            cfg_path[AUTOLOAD_MAX_PATH];
+        char            romname[AUTOLOAD_MAX_PATH];
+        char            file[AUTOLOAD_MAX_PATH * 3];
+        void           *buf        = NULL;
+        int64_t         len        = 0;
+        size_t          expected   = retro_serialize_size();
+        const uint8_t  *state_data = NULL;
+        size_t          state_size = 0;
+        size_t          plen;
+
+        autoload_get_self_dir(autoload_dir, sizeof(autoload_dir));
+        if (autoload_dir[0] == '\0')
+        {
+                if (logCallback)
+                        logCallback(RETRO_LOG_WARN,
+                              "[autoload] could not resolve core directory\n");
+                return;
+        }
+
+        autoload_get_self_name(autoload_core_name, sizeof(autoload_core_name));
+        autoload_log_rotate(AUTOLOAD_MAX_RUNS - 1);  /* keep 24; this run makes 25 */
+
+        {
+                time_t     t  = time(NULL);
+                struct tm *lt = localtime(&t);
+                char       ts[32];
+                if (lt) strftime(ts, sizeof(ts), "%Y-%m-%d %H:%M:%S", lt);
+                else    ts[0] = '\0';
+                autoload_logf("--- autoload run --- core=%s  %s", autoload_core_name, ts);
+        }
+        autoload_logf("core directory : %s", autoload_dir);
+
+        autoload_get_self_cfg(cfg_path, sizeof(cfg_path));
+        autoload_logf("config file   : %s", cfg_path);
+
+        if (!autoload_read_config(cfg_path, &cfg))
+        {
+                autoload_logf("RESULT        : config file not found - nothing loaded");
+                return;
+        }
+
+        if (!cfg.enabled)
+        {
+                autoload_logf("RESULT        : disabled in config (enabled=0)");
+                return;
+        }
+
+        if (cfg.num_paths == 0)
+        {
+                autoload_logf("RESULT        : no save_path in config");
+                return;
+        }
+
+        if (autoload_rom_path[0] == '\0')
+        {
+                autoload_logf("RESULT        : ROM path unknown (frontend gave none)");
+                return;
+        }
+
+        autoload_rom_basename(romname, sizeof(romname));
+        autoload_logf("rom path      : %s", autoload_rom_path);
+        autoload_logf("rom name      : %s", romname);
+        autoload_logf("state ext     : %s", cfg.state_ext);
+        autoload_logf("core expects  : %u bytes", (unsigned)expected);
+
+        /* Try each save_path in order; the first folder that has a matching
+         * state file wins. (Useful for multi-system cores that store states
+         * in per-system folders.) */
+        {
+                int  i;
+                bool found = false;
+                for (i = 0; i < cfg.num_paths; i++)
+                {
+                        char  *sp = cfg.save_paths[i];
+                        while ((plen = strlen(sp)) > 0 &&
+                               (sp[plen-1] == '\\' || sp[plen-1] == '/'))
+                                sp[plen-1] = '\0';
+
+                        snprintf(file, sizeof(file), "%s%c%s.%s", sp, AUTOLOAD_PATH_SEP, romname, cfg.state_ext);
+                        autoload_logf("trying        : %s", file);
+
+                        {
+                                FILE *sf = fopen(file, "rb");
+                                if (sf)
+                                {
+                                        autoload_logf("found in      : %s", sp);
+                                        found = true;
+                                        fclose(sf);
+                                        break;
+                                }
+                        }
+                }
+                if (!found)
+                {
+                        autoload_logf("RESULT        : no matching state file in any save_path");
+                        return;
+                }
+
+                /* 'file' already contains the correct path from the loop above */
+        }
+
+        /* Read the state file using fopen/fread */
+        {
+                FILE *sf = fopen(file, "rb");
+                if (!sf)
+                {
+                        autoload_logf("RESULT        : state file not found or unreadable");
+                        return;
+                }
+                fseek(sf, 0, SEEK_END);
+                len = (int64_t)ftell(sf);
+                fseek(sf, 0, SEEK_SET);
+                if (len <= 0)
+                {
+                        fclose(sf);
+                        autoload_logf("RESULT        : state file was empty");
+                        return;
+                }
+                buf = malloc((size_t)len);
+                if (!buf)
+                {
+                        fclose(sf);
+                        autoload_logf("RESULT        : out of memory");
+                        return;
+                }
+                if (fread(buf, 1, (size_t)len, sf) != (size_t)len)
+                {
+                        free(buf);
+                        fclose(sf);
+                        autoload_logf("RESULT        : state file read error");
+                        return;
+                }
+                fclose(sf);
+        }
+
+        autoload_logf("file size     : %d bytes", (int)len);
+
+        if (buf && len > 0)
+        {
+                /* Unwrap RetroArch's RASTATE container if present. */
+                if (autoload_extract_rastate((const uint8_t*)buf, (size_t)len,
+                                             &state_data, &state_size))
+                        autoload_logf("RASTATE       : container detected, MEM block = %u bytes",
+                                      (unsigned)state_size);
+                else
+                {
+                        state_data = (const uint8_t*)buf;
+                        state_size = (size_t)len;
+                        autoload_logf("RASTATE       : not a container, using raw file");
+                }
+
+                if (state_size != expected)
+                        autoload_logf("WARNING       : state is %u bytes but core expects %u "
+                                      "(wrong ROM, or RetroArch 'Save State Compression' is ON "
+                                      "- turn it OFF and re-save).",
+                                      (unsigned)state_size, (unsigned)expected);
+
+                if (retro_unserialize(state_data, state_size))
+                        autoload_logf("RESULT        : state loaded OK");
+                else
+                        autoload_logf("RESULT        : retro_unserialize() refused the data");
+        }
+        else
+                autoload_logf("RESULT        : file was empty");
+
+        if (buf)
+                free(buf);
+}
+/* ---- End config-driven auto-load save state (cross-platform) ---- */
+
 void retro_run(void) {
-	if (deferredSetup) {
-		_doDeferredSetup();
-	}
-	uint16_t keys;
-	bool skipFrame = false;
+        if (deferredSetup) {
+                _doDeferredSetup();
+        }
+        uint16_t keys;
+        bool skipFrame = false;
 
-	inputPollCallback();
+        if (autoload_state_pending)
+        {
+                autoload_state_pending = false;
+                autoload_try_load_state();
+        }
 
-	bool updated = false;
-	if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated) {
-		envVarsUpdated = true;
+        inputPollCallback();
 
-		struct retro_variable var = {
-			.key = "mgba_allow_opposing_directions",
-			.value = 0
-		};
-		if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
-			mCoreConfigSetIntValue(&core->config, "allowOpposingDirections", strcmp(var.value, "yes") == 0);
-			core->reloadConfigOption(core, "allowOpposingDirections", NULL);
-		}
+        bool updated = false;
+        if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE_UPDATE, &updated) && updated) {
+                envVarsUpdated = true;
 
-		_loadFrameskipSettings(NULL);
-		_loadAudioLowPassFilterSettings();
+                struct retro_variable var = {
+                        .key = "mgba_allow_opposing_directions",
+                        .value = 0
+                };
+                if (environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) && var.value) {
+                        mCoreConfigSetIntValue(&core->config, "allowOpposingDirections", strcmp(var.value, "yes") == 0);
+                        core->reloadConfigOption(core, "allowOpposingDirections", NULL);
+                }
+
+                _loadFrameskipSettings(NULL);
+                _loadAudioLowPassFilterSettings();
 
 #if defined(COLOR_16_BIT) && defined(COLOR_5_6_5)
-		_loadPostProcessingSettings();
+                _loadPostProcessingSettings();
 #endif
 #ifdef M_CORE_GB
-		_updateGbPal();
+                _updateGbPal();
 #endif
-	}
+        }
 
-	keys = 0;
-	int i;
-	if (useBitmasks) {
-		int16_t joypadMask = inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
-		for (i = 0; i < sizeof(keymap) / sizeof(*keymap); ++i) {
-			keys |= ((joypadMask >> keymap[i]) & 1) << i;
-		}
-		// XXX: turbo keys, should be moved to frontend
+        keys = 0;
+        int i;
+        if (useBitmasks) {
+                int16_t joypadMask = inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_MASK);
+                for (i = 0; i < sizeof(keymap) / sizeof(*keymap); ++i) {
+                        keys |= ((joypadMask >> keymap[i]) & 1) << i;
+                }
+                // XXX: turbo keys, should be moved to frontend
 #define JOYPAD_BIT(BUTTON) (1 << RETRO_DEVICE_ID_JOYPAD_ ## BUTTON)
-		keys |= cycleturbo(joypadMask & JOYPAD_BIT(X), joypadMask & JOYPAD_BIT(Y), joypadMask & JOYPAD_BIT(L2), joypadMask & JOYPAD_BIT(R2));
+                keys |= cycleturbo(joypadMask & JOYPAD_BIT(X), joypadMask & JOYPAD_BIT(Y), joypadMask & JOYPAD_BIT(L2), joypadMask & JOYPAD_BIT(R2));
 #undef JOYPAD_BIT
-	} else {
-		for (i = 0; i < sizeof(keymap) / sizeof(*keymap); ++i) {
-			keys |= (!!inputCallback(0, RETRO_DEVICE_JOYPAD, 0, keymap[i])) << i;
-		}
-		// XXX: turbo keys, should be moved to frontend
-		keys |= cycleturbo(
-			inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X),
-			inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y),
-			inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2),
-			inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2)
-		);
-	}
+        } else {
+                for (i = 0; i < sizeof(keymap) / sizeof(*keymap); ++i) {
+                        keys |= (!!inputCallback(0, RETRO_DEVICE_JOYPAD, 0, keymap[i])) << i;
+                }
+                // XXX: turbo keys, should be moved to frontend
+                keys |= cycleturbo(
+                        inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_X),
+                        inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_Y),
+                        inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L2),
+                        inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R2)
+                );
+        }
 
-	core->setKeys(core, keys);
+        core->setKeys(core, keys);
 
-	if (!luxSensorUsed) {
-		static bool wasAdjustingLux = false;
-		if (wasAdjustingLux) {
-			wasAdjustingLux = inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3) ||
-			                  inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3);
-		} else {
-			if (inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3)) {
-				++luxLevelIndex;
-				if (luxLevelIndex > 10) {
-					luxLevelIndex = 10;
-				}
-				wasAdjustingLux = true;
-			} else if (inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3)) {
-				--luxLevelIndex;
-				if (luxLevelIndex < 0) {
-					luxLevelIndex = 0;
-				}
-				wasAdjustingLux = true;
-			}
-		}
-	}
+        if (!luxSensorUsed) {
+                static bool wasAdjustingLux = false;
+                if (wasAdjustingLux) {
+                        wasAdjustingLux = inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3) ||
+                                          inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3);
+                } else {
+                        if (inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_R3)) {
+                                ++luxLevelIndex;
+                                if (luxLevelIndex > 10) {
+                                        luxLevelIndex = 10;
+                                }
+                                wasAdjustingLux = true;
+                        } else if (inputCallback(0, RETRO_DEVICE_JOYPAD, 0, RETRO_DEVICE_ID_JOYPAD_L3)) {
+                                --luxLevelIndex;
+                                if (luxLevelIndex < 0) {
+                                        luxLevelIndex = 0;
+                                }
+                                wasAdjustingLux = true;
+                        }
+                }
+        }
 
-	/* Check whether current frame should
-	 * be skipped */
-	if ((frameskipType > 0)  &&
-		 (frameskipType != 3) && /* Ignore 'Fixed Interval' - handled internally */
-		 retroAudioBuffActive) {
+        /* Check whether current frame should
+         * be skipped */
+        if ((frameskipType > 0)  &&
+                 (frameskipType != 3) && /* Ignore 'Fixed Interval' - handled internally */
+                 retroAudioBuffActive) {
 
-		switch (frameskipType) {
-			case 1: /* Auto */
-				skipFrame = retroAudioBuffUnderrun;
-				break;
-			case 2: /* Auto (Threshold) */
-				skipFrame = (retroAudioBuffOccupancy < frameskipThreshold);
-				break;
-			default:
-				skipFrame = false;
-				break;
-		}
+                switch (frameskipType) {
+                        case 1: /* Auto */
+                                skipFrame = retroAudioBuffUnderrun;
+                                break;
+                        case 2: /* Auto (Threshold) */
+                                skipFrame = (retroAudioBuffOccupancy < frameskipThreshold);
+                                break;
+                        default:
+                                skipFrame = false;
+                                break;
+                }
 
-		if (skipFrame) {
-			if(frameskipCounter < RETRO_FRAMESKIP_MAX) {
+                if (skipFrame) {
+                        if(frameskipCounter < RETRO_FRAMESKIP_MAX) {
 
-				switch (core->platform(core)) {
+                                switch (core->platform(core)) {
 #ifdef M_CORE_GBA
-				case mPLATFORM_GBA:
-					((struct GBA*) core->board)->video.frameskipCounter = 1;
-					break;
+                                case mPLATFORM_GBA:
+                                        ((struct GBA*) core->board)->video.frameskipCounter = 1;
+                                        break;
 #endif
 #ifdef M_CORE_GB
-				case mPLATFORM_GB:
-					((struct GB*) core->board)->video.frameskipCounter = 1;
-					break;
+                                case mPLATFORM_GB:
+                                        ((struct GB*) core->board)->video.frameskipCounter = 1;
+                                        break;
 #endif
-				default:
-					break;
-				}
-				frameskipCounter++;
+                                default:
+                                        break;
+                                }
+                                frameskipCounter++;
 
-			} else {
-				frameskipCounter = 0;
-				skipFrame        = false;
-			}
-		} else {
-			frameskipCounter = 0;
-		}
-	}
+                        } else {
+                                frameskipCounter = 0;
+                                skipFrame        = false;
+                        }
+                } else {
+                        frameskipCounter = 0;
+                }
+        }
 
    /* If frameskip settings have changed, update
     * frontend audio latency */
@@ -1683,52 +2193,52 @@ void retro_run(void) {
       updateAudioLatency = false;
    }
 
-	core->runFrame(core);
-	unsigned width, height;
-	core->currentVideoSize(core, &width, &height);
+        core->runFrame(core);
+        unsigned width, height;
+        core->currentVideoSize(core, &width, &height);
 
-	/* If using 'Fixed Interval' frameskipping, check
-	 * whether a frame is currently available  */
-	if (frameskipType == 3) {
-		switch (core->platform(core)) {
-	#ifdef M_CORE_GBA
-		case mPLATFORM_GBA:
-			skipFrame = ((struct GBA*) core->board)->video.frameskipCounter > 0;
-			break;
-	#endif
-	#ifdef M_CORE_GB
-		case mPLATFORM_GB:
-			skipFrame = ((struct GB*) core->board)->video.frameskipCounter > 0;
-			break;
-	#endif
-		default:
-			break;
-		}
-	}
+        /* If using 'Fixed Interval' frameskipping, check
+         * whether a frame is currently available  */
+        if (frameskipType == 3) {
+                switch (core->platform(core)) {
+        #ifdef M_CORE_GBA
+                case mPLATFORM_GBA:
+                        skipFrame = ((struct GBA*) core->board)->video.frameskipCounter > 0;
+                        break;
+        #endif
+        #ifdef M_CORE_GB
+                case mPLATFORM_GB:
+                        skipFrame = ((struct GB*) core->board)->video.frameskipCounter > 0;
+                        break;
+        #endif
+                default:
+                        break;
+                }
+        }
 
-	if (!skipFrame) {
+        if (!skipFrame) {
 #if defined(COLOR_16_BIT) && defined(COLOR_5_6_5)
-		if (videoPostProcess) {
-			videoPostProcess(width, height);
-			videoCallback(ppOutputBuffer, width, height, VIDEO_WIDTH_MAX * sizeof(mColor));
-		} else
+                if (videoPostProcess) {
+                        videoPostProcess(width, height);
+                        videoCallback(ppOutputBuffer, width, height, VIDEO_WIDTH_MAX * sizeof(mColor));
+                } else
 #endif
-			videoCallback(outputBuffer, width, height, VIDEO_WIDTH_MAX * sizeof(mColor));
-	} else {
-		videoCallback(NULL, width, height, VIDEO_WIDTH_MAX * sizeof(mColor));
-	}
+                        videoCallback(outputBuffer, width, height, VIDEO_WIDTH_MAX * sizeof(mColor));
+        } else {
+                videoCallback(NULL, width, height, VIDEO_WIDTH_MAX * sizeof(mColor));
+        }
 
-	/* Check whether audio sample rate has changed */
-	if (updateAudioRate) {
-		struct retro_system_av_info info;
-		retro_get_system_av_info(&info);
-		environCallback(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &info);
-		updateAudioRate = false;
-	}
+        /* Check whether audio sample rate has changed */
+        if (updateAudioRate) {
+                struct retro_system_av_info info;
+                retro_get_system_av_info(&info);
+                environCallback(RETRO_ENVIRONMENT_SET_SYSTEM_AV_INFO, &info);
+                updateAudioRate = false;
+        }
 
 #ifdef M_CORE_GBA
-	if (core->platform(core) == mPLATFORM_GBA) {
-		struct mAudioBuffer *coreBuffer = core->getAudioBuffer(core);
+        if (core->platform(core) == mPLATFORM_GBA) {
+                struct mAudioBuffer *coreBuffer = core->getAudioBuffer(core);
         int coreSamplesAvail = mAudioBufferAvailable(coreBuffer);
         if (coreSamplesAvail > 0) {
             unsigned coreSampleRate = core->audioSampleRate(core);
@@ -1750,862 +2260,871 @@ void retro_run(void) {
                 audioCallback(audioSampleBuffer, samplesProduced);
             }
         }
-	}
+        }
 #endif
 }
 
 static void _setupMaps(struct mCore* core) {
 #ifdef M_CORE_GBA
-	if (core->platform(core) == mPLATFORM_GBA) {
-		struct GBA* gba = core->board;
-		struct retro_memory_descriptor descs[11];
-		struct retro_memory_map mmaps;
-		size_t romSize = gba->memory.romSize + (gba->memory.romSize & 1);
+        if (core->platform(core) == mPLATFORM_GBA) {
+                struct GBA* gba = core->board;
+                struct retro_memory_descriptor descs[11];
+                struct retro_memory_map mmaps;
+                size_t romSize = gba->memory.romSize + (gba->memory.romSize & 1);
 
-		memset(descs, 0, sizeof(descs));
-		size_t savedataSize = retro_get_memory_size(RETRO_MEMORY_SAVE_RAM);
+                memset(descs, 0, sizeof(descs));
+                size_t savedataSize = retro_get_memory_size(RETRO_MEMORY_SAVE_RAM);
 
-		/* Map internal working RAM */
-		descs[0].ptr    = gba->memory.iwram;
-		descs[0].start  = GBA_BASE_IWRAM;
-		descs[0].len    = GBA_SIZE_IWRAM;
-		descs[0].select = 0xFF000000;
-		descs[0].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
+                /* Map internal working RAM */
+                descs[0].ptr    = gba->memory.iwram;
+                descs[0].start  = GBA_BASE_IWRAM;
+                descs[0].len    = GBA_SIZE_IWRAM;
+                descs[0].select = 0xFF000000;
+                descs[0].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
 
-		/* Map working RAM */
-		descs[1].ptr    = gba->memory.wram;
-		descs[1].start  = GBA_BASE_EWRAM;
-		descs[1].len    = GBA_SIZE_EWRAM;
-		descs[1].select = 0xFF000000;
-		descs[1].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
+                /* Map working RAM */
+                descs[1].ptr    = gba->memory.wram;
+                descs[1].start  = GBA_BASE_EWRAM;
+                descs[1].len    = GBA_SIZE_EWRAM;
+                descs[1].select = 0xFF000000;
+                descs[1].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
 
-		/* Map save RAM */
-		/* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
-		descs[2].ptr    = savedataSize ? savedata : NULL;
-		descs[2].start  = GBA_BASE_SRAM;
-		descs[2].len    = savedataSize;
+                /* Map save RAM */
+                /* TODO: if SRAM is flash, use start=0 addrspace="S" instead */
+                descs[2].ptr    = savedataSize ? savedata : NULL;
+                descs[2].start  = GBA_BASE_SRAM;
+                descs[2].len    = savedataSize;
 
-		/* Map ROM */
-		descs[3].ptr    = gba->memory.rom;
-		descs[3].start  = GBA_BASE_ROM0;
-		descs[3].len    = romSize;
-		descs[3].flags  = RETRO_MEMDESC_CONST;
+                /* Map ROM */
+                descs[3].ptr    = gba->memory.rom;
+                descs[3].start  = GBA_BASE_ROM0;
+                descs[3].len    = romSize;
+                descs[3].flags  = RETRO_MEMDESC_CONST;
 
-		descs[4].ptr    = gba->memory.rom;
-		descs[4].start  = GBA_BASE_ROM1;
-		descs[4].len    = romSize;
-		descs[4].flags  = RETRO_MEMDESC_CONST;
+                descs[4].ptr    = gba->memory.rom;
+                descs[4].start  = GBA_BASE_ROM1;
+                descs[4].len    = romSize;
+                descs[4].flags  = RETRO_MEMDESC_CONST;
 
-		descs[5].ptr    = gba->memory.rom;
-		descs[5].start  = GBA_BASE_ROM2;
-		descs[5].len    = romSize;
-		descs[5].flags  = RETRO_MEMDESC_CONST;
+                descs[5].ptr    = gba->memory.rom;
+                descs[5].start  = GBA_BASE_ROM2;
+                descs[5].len    = romSize;
+                descs[5].flags  = RETRO_MEMDESC_CONST;
 
-		/* Map BIOS */
-		descs[6].ptr    = gba->memory.bios;
-		descs[6].start  = GBA_BASE_BIOS;
-		descs[6].len    = GBA_SIZE_BIOS;
-		descs[6].flags  = RETRO_MEMDESC_CONST;
+                /* Map BIOS */
+                descs[6].ptr    = gba->memory.bios;
+                descs[6].start  = GBA_BASE_BIOS;
+                descs[6].len    = GBA_SIZE_BIOS;
+                descs[6].flags  = RETRO_MEMDESC_CONST;
 
-		/* Map VRAM */
-		descs[7].ptr    = gba->video.vram;
-		descs[7].start  = GBA_BASE_VRAM;
-		descs[7].len    = GBA_SIZE_VRAM;
-		descs[7].select = 0xFF000000;
+                /* Map VRAM */
+                descs[7].ptr    = gba->video.vram;
+                descs[7].start  = GBA_BASE_VRAM;
+                descs[7].len    = GBA_SIZE_VRAM;
+                descs[7].select = 0xFF000000;
 
-		/* Map palette RAM */
-		descs[8].ptr    = gba->video.palette;
-		descs[8].start  = GBA_BASE_PALETTE_RAM;
-		descs[8].len    = GBA_SIZE_PALETTE_RAM;
-		descs[8].select = 0xFF000000;
+                /* Map palette RAM */
+                descs[8].ptr    = gba->video.palette;
+                descs[8].start  = GBA_BASE_PALETTE_RAM;
+                descs[8].len    = GBA_SIZE_PALETTE_RAM;
+                descs[8].select = 0xFF000000;
 
-		/* Map OAM */
-		descs[9].ptr    = &gba->video.oam; /* video.oam is a structure */
-		descs[9].start  = GBA_BASE_OAM;
-		descs[9].len    = GBA_SIZE_OAM;
-		descs[9].select = 0xFF000000;
+                /* Map OAM */
+                descs[9].ptr    = &gba->video.oam; /* video.oam is a structure */
+                descs[9].start  = GBA_BASE_OAM;
+                descs[9].len    = GBA_SIZE_OAM;
+                descs[9].select = 0xFF000000;
 
-		/* Map mmapped I/O */
-		descs[10].ptr    = gba->memory.io;
-		descs[10].start  = GBA_BASE_IO;
-		descs[10].len    = GBA_SIZE_IO;
+                /* Map mmapped I/O */
+                descs[10].ptr    = gba->memory.io;
+                descs[10].start  = GBA_BASE_IO;
+                descs[10].len    = GBA_SIZE_IO;
 
-		mmaps.descriptors = descs;
-		mmaps.num_descriptors = sizeof(descs) / sizeof(descs[0]);
+                mmaps.descriptors = descs;
+                mmaps.num_descriptors = sizeof(descs) / sizeof(descs[0]);
 
-		bool yes = true;
-		environCallback(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &mmaps);
-		environCallback(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
-	}
+                bool yes = true;
+                environCallback(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &mmaps);
+                environCallback(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
+        }
 #endif
 #ifdef M_CORE_GB
-	if (core->platform(core) == mPLATFORM_GB) {
-		struct GB* gb = core->board;
-		struct retro_memory_descriptor descs[12];
-		struct retro_memory_map mmaps;
+        if (core->platform(core) == mPLATFORM_GB) {
+                struct GB* gb = core->board;
+                struct retro_memory_descriptor descs[12];
+                struct retro_memory_map mmaps;
 
-		memset(descs, 0, sizeof(descs));
-		size_t savedataSize = retro_get_memory_size(RETRO_MEMORY_SAVE_RAM);
+                memset(descs, 0, sizeof(descs));
+                size_t savedataSize = retro_get_memory_size(RETRO_MEMORY_SAVE_RAM);
 
-		unsigned i = 0;
+                unsigned i = 0;
 
-		/* Map ROM */
-		descs[i].ptr    = gb->memory.rom;
-		descs[i].start  = GB_BASE_CART_BANK0;
-		descs[i].len    = GB_SIZE_CART_BANK0;
-		descs[i].flags  = RETRO_MEMDESC_CONST;
-		i++;
+                /* Map ROM */
+                descs[i].ptr    = gb->memory.rom;
+                descs[i].start  = GB_BASE_CART_BANK0;
+                descs[i].len    = GB_SIZE_CART_BANK0;
+                descs[i].flags  = RETRO_MEMDESC_CONST;
+                i++;
 
-		descs[i].ptr    = gb->memory.rom;
-		descs[i].offset = GB_SIZE_CART_BANK0;
-		descs[i].start  = GB_BASE_CART_BANK1;
-		descs[i].len    = GB_SIZE_CART_BANK0;
-		descs[i].flags  = RETRO_MEMDESC_CONST;
-		i++;
+                descs[i].ptr    = gb->memory.rom;
+                descs[i].offset = GB_SIZE_CART_BANK0;
+                descs[i].start  = GB_BASE_CART_BANK1;
+                descs[i].len    = GB_SIZE_CART_BANK0;
+                descs[i].flags  = RETRO_MEMDESC_CONST;
+                i++;
 
-		/* Map VRAM */
-		descs[i].ptr    = gb->video.vram;
-		descs[i].start  = GB_BASE_VRAM;
-		descs[i].len    = GB_SIZE_VRAM_BANK0;
-		i++;
+                /* Map VRAM */
+                descs[i].ptr    = gb->video.vram;
+                descs[i].start  = GB_BASE_VRAM;
+                descs[i].len    = GB_SIZE_VRAM_BANK0;
+                i++;
 
-		/* Map working RAM */
-		descs[i].ptr    = gb->memory.wram;
-		descs[i].start  = GB_BASE_WORKING_RAM_BANK0;
-		descs[i].len    = GB_SIZE_WORKING_RAM_BANK0;
-		descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM;  // Allow RetroArch to access this memory for cheats
-		i++;
+                /* Map working RAM */
+                descs[i].ptr    = gb->memory.wram;
+                descs[i].start  = GB_BASE_WORKING_RAM_BANK0;
+                descs[i].len    = GB_SIZE_WORKING_RAM_BANK0;
+                descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM;  // Allow RetroArch to access this memory for cheats
+                i++;
 
-		descs[i].ptr    = gb->memory.wram;
-		descs[i].offset = GB_SIZE_WORKING_RAM_BANK0;
-		descs[i].start  = GB_BASE_WORKING_RAM_BANK1;
-		descs[i].len    = GB_SIZE_WORKING_RAM_BANK0;
-		descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
-		i++;
+                descs[i].ptr    = gb->memory.wram;
+                descs[i].offset = GB_SIZE_WORKING_RAM_BANK0;
+                descs[i].start  = GB_BASE_WORKING_RAM_BANK1;
+                descs[i].len    = GB_SIZE_WORKING_RAM_BANK0;
+                descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
+                i++;
 
-		/* Map OAM */
-		descs[i].ptr    = &gb->video.oam; /* video.oam is a structure */
-		descs[i].start  = GB_BASE_OAM;
-		descs[i].len    = GB_SIZE_OAM;
-		descs[i].select = 0xFFFFFF60;
-		i++;
+                /* Map OAM */
+                descs[i].ptr    = &gb->video.oam; /* video.oam is a structure */
+                descs[i].start  = GB_BASE_OAM;
+                descs[i].len    = GB_SIZE_OAM;
+                descs[i].select = 0xFFFFFF60;
+                i++;
 
-		/* Map mmapped I/O */
-		descs[i].ptr    = gb->memory.io;
-		descs[i].start  = GB_BASE_IO;
-		descs[i].len    = GB_SIZE_IO;
-		i++;
+                /* Map mmapped I/O */
+                descs[i].ptr    = gb->memory.io;
+                descs[i].start  = GB_BASE_IO;
+                descs[i].len    = GB_SIZE_IO;
+                i++;
 
-		/* Map High RAM */
-		descs[i].ptr    = gb->memory.hram;
-		descs[i].start  = GB_BASE_HRAM;
-		descs[i].len    = GB_SIZE_HRAM;
-		descs[i].select = 0xFFFFFF80;
-		descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
-		i++;
+                /* Map High RAM */
+                descs[i].ptr    = gb->memory.hram;
+                descs[i].start  = GB_BASE_HRAM;
+                descs[i].len    = GB_SIZE_HRAM;
+                descs[i].select = 0xFFFFFF80;
+                descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
+                i++;
 
-		/* Map IE Register */
-		descs[i].ptr    = &gb->memory.ie;
-		descs[i].start  = GB_BASE_IE;
-		descs[i].len    = 1;
-		i++;
+                /* Map IE Register */
+                descs[i].ptr    = &gb->memory.ie;
+                descs[i].start  = GB_BASE_IE;
+                descs[i].len    = 1;
+                i++;
 
-		/* Map External RAM */
-		if (savedataSize) {
-			descs[i].ptr    = savedata;
-			descs[i].start  = GB_BASE_EXTERNAL_RAM;
-			descs[i].len    = savedataSize < GB_SIZE_EXTERNAL_RAM ? savedataSize : GB_SIZE_EXTERNAL_RAM;
-			i++;
+                /* Map External RAM */
+                if (savedataSize) {
+                        descs[i].ptr    = savedata;
+                        descs[i].start  = GB_BASE_EXTERNAL_RAM;
+                        descs[i].len    = savedataSize < GB_SIZE_EXTERNAL_RAM ? savedataSize : GB_SIZE_EXTERNAL_RAM;
+                        i++;
 
-			if ((savedataSize & ~0xFF) > GB_SIZE_EXTERNAL_RAM) {
-				descs[i].ptr    = savedata;
-				descs[i].offset = GB_SIZE_EXTERNAL_RAM;
-				descs[i].start  = 0x16000;
-				descs[i].len    = savedataSize - GB_SIZE_EXTERNAL_RAM;
-				i++;
-			}
-		}
+                        if ((savedataSize & ~0xFF) > GB_SIZE_EXTERNAL_RAM) {
+                                descs[i].ptr    = savedata;
+                                descs[i].offset = GB_SIZE_EXTERNAL_RAM;
+                                descs[i].start  = 0x16000;
+                                descs[i].len    = savedataSize - GB_SIZE_EXTERNAL_RAM;
+                                i++;
+                        }
+                }
 
-		if (gb->model >= GB_MODEL_CGB) {
-			/* Map working RAM */
-			/* banks 2-7 of wram mapped in virtual address so it can be
-			 * accessed without bank switching, GBC only */
-			descs[i].ptr    = gb->memory.wram + 0x2000;
-			descs[i].start  = 0x10000;
-			descs[i].len    = GB_SIZE_WORKING_RAM - 0x2000;
-			descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
-			i++;
-		}
+                if (gb->model >= GB_MODEL_CGB) {
+                        /* Map working RAM */
+                        /* banks 2-7 of wram mapped in virtual address so it can be
+                         * accessed without bank switching, GBC only */
+                        descs[i].ptr    = gb->memory.wram + 0x2000;
+                        descs[i].start  = 0x10000;
+                        descs[i].len    = GB_SIZE_WORKING_RAM - 0x2000;
+                        descs[i].flags  = RETRO_MEMDESC_SYSTEM_RAM; // Allow RetroArch to access this memory for cheats
+                        i++;
+                }
 
-		mmaps.descriptors = descs;
-		mmaps.num_descriptors = i;
+                mmaps.descriptors = descs;
+                mmaps.num_descriptors = i;
 
-		bool yes = true;
-		environCallback(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &mmaps);
-		environCallback(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
-	}
+                bool yes = true;
+                environCallback(RETRO_ENVIRONMENT_SET_MEMORY_MAPS, &mmaps);
+                environCallback(RETRO_ENVIRONMENT_SET_SUPPORT_ACHIEVEMENTS, &yes);
+        }
 #endif
 }
 
 void retro_reset(void) {
-	core->reset(core);
-	mRumbleIntegratorReset(&rumble);
-	_setupMaps(core);
+        core->reset(core);
+        mRumbleIntegratorReset(&rumble);
+        _setupMaps(core);
 }
 
 #ifdef GEKKO
 static size_t _readRomFile(const char *path, void **buf) {
-	size_t rc;
-	long len;
-	FILE *file = fopen(path, "rb");
+        size_t rc;
+        long len;
+        FILE *file = fopen(path, "rb");
 
-	if (!file) {
-		goto error;
-	}
+        if (!file) {
+                goto error;
+        }
 
-	fseek(file, 0, SEEK_END);
-	len = ftell(file);
-	rewind(file);
-	*buf = anonymousMemoryMap(len);
-	if (!*buf) {
-		goto error;
-	}
+        fseek(file, 0, SEEK_END);
+        len = ftell(file);
+        rewind(file);
+        *buf = anonymousMemoryMap(len);
+        if (!*buf) {
+                goto error;
+        }
 
-	if ((rc = fread(*buf, 1, len, file)) < len) {
-		goto error;
-	}
+        if ((rc = fread(*buf, 1, len, file)) < len) {
+                goto error;
+        }
 
-	fclose(file);
-	return rc;
+        fclose(file);
+        return rc;
 
 error:
-	if (file) {
-		fclose(file);
-	}
-	mappedMemoryFree(*buf, len);
-	*buf = NULL;
-	return -1;
+        if (file) {
+                fclose(file);
+        }
+        mappedMemoryFree(*buf, len);
+        *buf = NULL;
+        return -1;
 }
 #endif
 
 bool retro_load_game(const struct retro_game_info* game) {
-	struct VFile* rom;
+        struct VFile* rom;
 
-	if (!game) {
-		return false;
-	}
+        if (!game) {
+                return false;
+        }
 
-	if (game->data) {
-		data = anonymousMemoryMap(game->size);
-		dataSize = game->size;
-		memcpy(data, game->data, game->size);
-		rom = VFileFromMemory(data, game->size);
+        if (game->data) {
+                data = anonymousMemoryMap(game->size);
+                dataSize = game->size;
+                memcpy(data, game->data, game->size);
+                rom = VFileFromMemory(data, game->size);
 #ifdef ENABLE_VFS
-	} else {
+        } else {
 #ifdef GEKKO
-		if ((dataSize = _readRomFile(game->path, &data)) == -1) {
-			return false;
-		}
-		rom = VFileFromMemory(data, dataSize);
+                if ((dataSize = _readRomFile(game->path, &data)) == -1) {
+                        return false;
+                }
+                rom = VFileFromMemory(data, dataSize);
 #else
-		data = NULL;
-		rom = VFileOpen(game->path, O_RDONLY);
+                data = NULL;
+                rom = VFileOpen(game->path, O_RDONLY);
 #endif
 #endif
-	}
-	if (!rom) {
-		return false;
-	}
+        }
+        if (!rom) {
+                return false;
+        }
 
-	core = mCoreFindVF(rom);
-	if (!core) {
-		rom->close(rom);
-		mappedMemoryFree(data, game->size);
-		return false;
-	}
-	mCoreInitConfig(core, NULL);
-	core->init(core);
+        core = mCoreFindVF(rom);
+        if (!core) {
+                rom->close(rom);
+                mappedMemoryFree(data, game->size);
+                return false;
+        }
+        mCoreInitConfig(core, NULL);
+        core->init(core);
 
 #ifdef _3DS
-	outputBuffer = linearMemAlign(VIDEO_BUFF_SIZE, 0x80);
+        outputBuffer = linearMemAlign(VIDEO_BUFF_SIZE, 0x80);
 #else
-	outputBuffer = malloc(VIDEO_BUFF_SIZE);
+        outputBuffer = malloc(VIDEO_BUFF_SIZE);
 #endif
-	memset(outputBuffer, 0xFFFF, VIDEO_BUFF_SIZE);
-	core->setVideoBuffer(core, outputBuffer, VIDEO_WIDTH_MAX);
+        memset(outputBuffer, 0xFFFF, VIDEO_BUFF_SIZE);
+        core->setVideoBuffer(core, outputBuffer, VIDEO_WIDTH_MAX);
 
 #ifdef M_CORE_GBA
-	/* GBA emulation produces a fairly regular number
-	 * of audio samples per frame that is consistent
-	 * with the set sample rate. We therefore consume
-	 * audio samples in retro_run() to achieve the
-	 * best possible frame pacing */
-	if (core->platform(core) == mPLATFORM_GBA) {
-		size_t audioSamplesPerFrame, audioBufferSize;
+        /* GBA emulation produces a fairly regular number
+         * of audio samples per frame that is consistent
+         * with the set sample rate. We therefore consume
+         * audio samples in retro_run() to achieve the
+         * best possible frame pacing */
+        if (core->platform(core) == mPLATFORM_GBA) {
+                size_t audioSamplesPerFrame, audioBufferSize;
         if (!environCallback(RETRO_ENVIRONMENT_GET_TARGET_SAMPLE_RATE, &targetSampleRate))
             targetSampleRate = GBA_RESAMPLED_RATE;
-		/* Get nominal output samples per frame */
+                /* Get nominal output samples per frame */
         audioSamplesPerFrame = (size_t)(
-				((float) targetSampleRate * (float) core->frameCycles(core) /
-						(float)core->frequency(core)) + 0.5f);
-		/* Round up to nearest multiple of 1024
-		 * > This is more than we need, but
-		 *   no harm in being safe... */
-		audioBufferSize = ((audioSamplesPerFrame + 1024 - 1) / 1024) * 1024;
-		/* Initialise resample buffer */
-		mAudioBufferInit(&audioResampleBuffer, audioBufferSize, 2);
-		/* Initialise resampler */
-		mAudioResamplerInit(&audioResampler, mINTERPOLATOR_SINC);
-		mAudioResamplerSetDestination(&audioResampler, &audioResampleBuffer, targetSampleRate);
-		/* Initialise output sample buffer
-		 * > Multiply size by 2 (channels) */
-		audioSampleBufferSize = audioBufferSize * 2;
-		audioSampleBuffer = malloc(audioSampleBufferSize * sizeof(int16_t));
-	} else
+                                ((float) targetSampleRate * (float) core->frameCycles(core) /
+                                                (float)core->frequency(core)) + 0.5f);
+                /* Round up to nearest multiple of 1024
+                 * > This is more than we need, but
+                 *   no harm in being safe... */
+                audioBufferSize = ((audioSamplesPerFrame + 1024 - 1) / 1024) * 1024;
+                /* Initialise resample buffer */
+                mAudioBufferInit(&audioResampleBuffer, audioBufferSize, 2);
+                /* Initialise resampler */
+                mAudioResamplerInit(&audioResampler, mINTERPOLATOR_SINC);
+                mAudioResamplerSetDestination(&audioResampler, &audioResampleBuffer, targetSampleRate);
+                /* Initialise output sample buffer
+                 * > Multiply size by 2 (channels) */
+                audioSampleBufferSize = audioBufferSize * 2;
+                audioSampleBuffer = malloc(audioSampleBufferSize * sizeof(int16_t));
+        } else
 #endif
-	{
-		/* GB/GBC emulation does not produce a number
-		 * of samples per frame that is consistent with
-		 * the set sample rate, and so it is unclear how
-		 * best to handle this. We therefore fallback to
-		 * using the regular stream-set _postAudioBuffer()
-		 * callback with a fixed buffer size, which seems
-		 * (historically) to produce adequate results */
-		stream.postAudioBuffer = _postAudioBuffer;
-		audioSampleBufferSize = GB_SAMPLES * 2;
-		audioSampleBuffer = malloc(audioSampleBufferSize * sizeof(int16_t));
-		core->setAudioBufferSize(core, GB_SAMPLES);
-	}
+        {
+                /* GB/GBC emulation does not produce a number
+                 * of samples per frame that is consistent with
+                 * the set sample rate, and so it is unclear how
+                 * best to handle this. We therefore fallback to
+                 * using the regular stream-set _postAudioBuffer()
+                 * callback with a fixed buffer size, which seems
+                 * (historically) to produce adequate results */
+                stream.postAudioBuffer = _postAudioBuffer;
+                audioSampleBufferSize = GB_SAMPLES * 2;
+                audioSampleBuffer = malloc(audioSampleBufferSize * sizeof(int16_t));
+                core->setAudioBufferSize(core, GB_SAMPLES);
+        }
 
-	core->setAVStream(core, &stream);
-	core->setPeripheral(core, mPERIPH_RUMBLE, &rumble);
-	core->setPeripheral(core, mPERIPH_ROTATION, &rotation);
+        core->setAVStream(core, &stream);
+        core->setPeripheral(core, mPERIPH_RUMBLE, &rumble);
+        core->setPeripheral(core, mPERIPH_ROTATION, &rotation);
 
-	savedata = anonymousMemoryMap(GBA_SIZE_FLASH1M);
-	memset(savedata, 0xFF, GBA_SIZE_FLASH1M);
+        savedata = anonymousMemoryMap(GBA_SIZE_FLASH1M);
+        memset(savedata, 0xFF, GBA_SIZE_FLASH1M);
 
-	_reloadSettings();
-	core->loadROM(core, rom);
-	deferredSetup = true;
+        _reloadSettings();
+        core->loadROM(core, rom);
+        deferredSetup = true;
 
-	const char* sysDir = 0;
-	const char* biosName = 0;
-	char biosPath[PATH_MAX];
-	environCallback(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &sysDir);
+        const char* sysDir = 0;
+        const char* biosName = 0;
+        char biosPath[PATH_MAX];
+        environCallback(RETRO_ENVIRONMENT_GET_SYSTEM_DIRECTORY, &sysDir);
 
 #ifdef M_CORE_GBA
-	if (core->platform(core) == mPLATFORM_GBA) {
-		core->setPeripheral(core, mPERIPH_GBA_LUMINANCE, &lux);
-		biosName = "gba_bios.bin";
-	}
+        if (core->platform(core) == mPLATFORM_GBA) {
+                core->setPeripheral(core, mPERIPH_GBA_LUMINANCE, &lux);
+                biosName = "gba_bios.bin";
+        }
 #endif
 
 #ifdef M_CORE_GB
-	if (core->platform(core) == mPLATFORM_GB) {
-		memset(&cam, 0, sizeof(cam));
-		cam.height = GBCAM_HEIGHT;
-		cam.width = GBCAM_WIDTH;
-		cam.caps = 1 << RETRO_CAMERA_BUFFER_RAW_FRAMEBUFFER;
-		cam.frame_raw_framebuffer = _updateCamera;
-		if (environCallback(RETRO_ENVIRONMENT_GET_CAMERA_INTERFACE, &cam)) {
-			core->setPeripheral(core, mPERIPH_IMAGE_SOURCE, &imageSource);
-		}
+        if (core->platform(core) == mPLATFORM_GB) {
+                memset(&cam, 0, sizeof(cam));
+                cam.height = GBCAM_HEIGHT;
+                cam.width = GBCAM_WIDTH;
+                cam.caps = 1 << RETRO_CAMERA_BUFFER_RAW_FRAMEBUFFER;
+                cam.frame_raw_framebuffer = _updateCamera;
+                if (environCallback(RETRO_ENVIRONMENT_GET_CAMERA_INTERFACE, &cam)) {
+                        core->setPeripheral(core, mPERIPH_IMAGE_SOURCE, &imageSource);
+                }
 
-		const char* modelName = mCoreConfigGetValue(&core->config, "gb.model");
-		struct GB* gb = core->board;
+                const char* modelName = mCoreConfigGetValue(&core->config, "gb.model");
+                struct GB* gb = core->board;
 
-		if (modelName) {
-			gb->model = GBNameToModel(modelName);
-		} else {
-			GBDetectModel(gb);
-		}
+                if (modelName) {
+                        gb->model = GBNameToModel(modelName);
+                } else {
+                        GBDetectModel(gb);
+                }
 
-		switch (gb->model) {
-		case GB_MODEL_AGB:
-		case GB_MODEL_CGB:
-		case GB_MODEL_SCGB:
-			biosName = "gbc_bios.bin";
-			break;
-		case GB_MODEL_SGB:
-			biosName = "sgb_bios.bin";
-			break;
-		case GB_MODEL_DMG:
-		default:
-			biosName = "gb_bios.bin";
-			break;
-		}
-	}
+                switch (gb->model) {
+                case GB_MODEL_AGB:
+                case GB_MODEL_CGB:
+                case GB_MODEL_SCGB:
+                        biosName = "gbc_bios.bin";
+                        break;
+                case GB_MODEL_SGB:
+                        biosName = "sgb_bios.bin";
+                        break;
+                case GB_MODEL_DMG:
+                default:
+                        biosName = "gb_bios.bin";
+                        break;
+                }
+        }
 #endif
 
 #ifdef ENABLE_VFS
-	if (core->opts.useBios && sysDir && biosName) {
-		snprintf(biosPath, sizeof(biosPath), "%s%s%s", sysDir, PATH_SEP, biosName);
-		struct VFile* bios = VFileOpen(biosPath, O_RDONLY);
-		if (bios) {
-			core->loadBIOS(core, bios, 0);
-		}
-	}
+        if (core->opts.useBios && sysDir && biosName) {
+                snprintf(biosPath, sizeof(biosPath), "%s%s%s", sysDir, PATH_SEP, biosName);
+                struct VFile* bios = VFileOpen(biosPath, O_RDONLY);
+                if (bios) {
+                        core->loadBIOS(core, bios, 0);
+                }
+        }
 #endif
 
-	return true;
+        /* Remember the ROM path and defer the auto-load to the first frame. */
+        autoload_rom_path[0] = '\0';
+        if (game && game->path)
+        {
+                strncpy(autoload_rom_path, game->path, sizeof(autoload_rom_path) - 1);
+                autoload_rom_path[sizeof(autoload_rom_path) - 1] = '\0';
+        }
+        autoload_state_pending = true;
+
+        return true;
 }
 
 void retro_unload_game(void) {
-	if (!core) {
-		return;
-	}
-	mCoreConfigDeinit(&core->config);
-	core->deinit(core);
-	mappedMemoryFree(data, dataSize);
-	data = 0;
-	mappedMemoryFree(savedata, GBA_SIZE_FLASH1M);
-	savedata = 0;
+        if (!core) {
+                return;
+        }
+        mCoreConfigDeinit(&core->config);
+        core->deinit(core);
+        mappedMemoryFree(data, dataSize);
+        data = 0;
+        mappedMemoryFree(savedata, GBA_SIZE_FLASH1M);
+        savedata = 0;
 }
 
 size_t retro_serialize_size(void) {
-	if (deferredSetup) {
-		_doDeferredSetup();
-	}
-	struct VFile* vfm = VFileMemChunk(NULL, 0);
-	mCoreSaveStateNamed(core, vfm, SAVESTATE_SAVEDATA | SAVESTATE_RTC);
-	size_t size = vfm->size(vfm);
-	vfm->close(vfm);
-	return size;
+        if (deferredSetup) {
+                _doDeferredSetup();
+        }
+        struct VFile* vfm = VFileMemChunk(NULL, 0);
+        mCoreSaveStateNamed(core, vfm, SAVESTATE_SAVEDATA | SAVESTATE_RTC);
+        size_t size = vfm->size(vfm);
+        vfm->close(vfm);
+        return size;
 }
 
 bool retro_serialize(void* data, size_t size) {
-	if (deferredSetup) {
-		_doDeferredSetup();
-	}
-	struct VFile* vfm = VFileMemChunk(NULL, 0);
-	mCoreSaveStateNamed(core, vfm, SAVESTATE_SAVEDATA | SAVESTATE_RTC);
-	if ((ssize_t) size > vfm->size(vfm)) {
-		size = vfm->size(vfm);
-	} else if ((ssize_t) size < vfm->size(vfm)) {
-		vfm->close(vfm);
-		return false;
-	}
-	vfm->seek(vfm, 0, SEEK_SET);
-	vfm->read(vfm, data, size);
-	vfm->close(vfm);
-	return true;
+        if (deferredSetup) {
+                _doDeferredSetup();
+        }
+        struct VFile* vfm = VFileMemChunk(NULL, 0);
+        mCoreSaveStateNamed(core, vfm, SAVESTATE_SAVEDATA | SAVESTATE_RTC);
+        if ((ssize_t) size > vfm->size(vfm)) {
+                size = vfm->size(vfm);
+        } else if ((ssize_t) size < vfm->size(vfm)) {
+                vfm->close(vfm);
+                return false;
+        }
+        vfm->seek(vfm, 0, SEEK_SET);
+        vfm->read(vfm, data, size);
+        vfm->close(vfm);
+        return true;
 }
 
 bool retro_unserialize(const void* data, size_t size) {
-	if (deferredSetup) {
-		_doDeferredSetup();
-	}
-	struct VFile* vfm = VFileFromConstMemory(data, size);
-	bool success = mCoreLoadStateNamed(core, vfm, SAVESTATE_RTC);
-	vfm->close(vfm);
-	return success;
+        if (deferredSetup) {
+                _doDeferredSetup();
+        }
+        struct VFile* vfm = VFileFromConstMemory(data, size);
+        bool success = mCoreLoadStateNamed(core, vfm, SAVESTATE_RTC);
+        vfm->close(vfm);
+        return success;
 }
 
 void retro_cheat_reset(void) {
-	mCheatDeviceClear(core->cheatDevice(core));
+        mCheatDeviceClear(core->cheatDevice(core));
 }
 
 void retro_cheat_set(unsigned index, bool enabled, const char* code) {
-	UNUSED(index);
-	UNUSED(enabled);
-	struct mCheatDevice* device = core->cheatDevice(core);
-	struct mCheatSet* cheatSet = NULL;
-	if (mCheatSetsSize(&device->cheats)) {
-		cheatSet = *mCheatSetsGetPointer(&device->cheats, 0);
-	} else {
-		cheatSet = device->createSet(device, NULL);
-		mCheatAddSet(device, cheatSet);
-	}
+        UNUSED(index);
+        UNUSED(enabled);
+        struct mCheatDevice* device = core->cheatDevice(core);
+        struct mCheatSet* cheatSet = NULL;
+        if (mCheatSetsSize(&device->cheats)) {
+                cheatSet = *mCheatSetsGetPointer(&device->cheats, 0);
+        } else {
+                cheatSet = device->createSet(device, NULL);
+                mCheatAddSet(device, cheatSet);
+        }
 // Convert the super wonky unportable libretro format to something normal
 #ifdef M_CORE_GBA
-	if (core->platform(core) == mPLATFORM_GBA) {
-		char realCode[] = "XXXXXXXX XXXXXXXX";
-		size_t len = strlen(code) + 1; // Include null terminator
-		size_t i, pos;
-		for (i = 0, pos = 0; i < len; ++i) {
-			if (isspace((int) code[i]) || code[i] == '+') {
-				realCode[pos] = ' ';
-			} else {
-				realCode[pos] = code[i];
-			}
-			if ((pos == 13 && (realCode[pos] == ' ' || !realCode[pos])) || pos == 17) {
-				realCode[pos] = '\0';
-				mCheatAddLine(cheatSet, realCode, 0);
-				pos = 0;
-				continue;
-			}
-			++pos;
-		}
-	}
+        if (core->platform(core) == mPLATFORM_GBA) {
+                char realCode[] = "XXXXXXXX XXXXXXXX";
+                size_t len = strlen(code) + 1; // Include null terminator
+                size_t i, pos;
+                for (i = 0, pos = 0; i < len; ++i) {
+                        if (isspace((int) code[i]) || code[i] == '+') {
+                                realCode[pos] = ' ';
+                        } else {
+                                realCode[pos] = code[i];
+                        }
+                        if ((pos == 13 && (realCode[pos] == ' ' || !realCode[pos])) || pos == 17) {
+                                realCode[pos] = '\0';
+                                mCheatAddLine(cheatSet, realCode, 0);
+                                pos = 0;
+                                continue;
+                        }
+                        ++pos;
+                }
+        }
 #endif
 #ifdef M_CORE_GB
-	if (core->platform(core) == mPLATFORM_GB) {
-		char realCode[] = "XXX-XXX-XXX";
-		size_t len = strlen(code) + 1; // Include null terminator
-		size_t i, pos;
-		for (i = 0, pos = 0; i < len; ++i) {
-			if (isspace((int) code[i]) || code[i] == '+') {
-				realCode[pos] = '\0';
-			} else {
-				realCode[pos] = code[i];
-			}
+        if (core->platform(core) == mPLATFORM_GB) {
+                char realCode[] = "XXX-XXX-XXX";
+                size_t len = strlen(code) + 1; // Include null terminator
+                size_t i, pos;
+                for (i = 0, pos = 0; i < len; ++i) {
+                        if (isspace((int) code[i]) || code[i] == '+') {
+                                realCode[pos] = '\0';
+                        } else {
+                                realCode[pos] = code[i];
+                        }
 
-			if (pos == 11 || !realCode[pos]) {
-				realCode[pos] = '\0';
-				mCheatAddLine(cheatSet, realCode, 0);
-				pos = 0;
-				continue;
-			}
-			++pos;
-		}
-	}
+                        if (pos == 11 || !realCode[pos]) {
+                                realCode[pos] = '\0';
+                                mCheatAddLine(cheatSet, realCode, 0);
+                                pos = 0;
+                                continue;
+                        }
+                        ++pos;
+                }
+        }
 #endif
-	if (cheatSet->refresh) {
-		cheatSet->refresh(cheatSet, device);
-	}
+        if (cheatSet->refresh) {
+                cheatSet->refresh(cheatSet, device);
+        }
 }
 
 unsigned retro_get_region(void) {
-	return RETRO_REGION_NTSC; // TODO: This isn't strictly true
+        return RETRO_REGION_NTSC; // TODO: This isn't strictly true
 }
 
 void retro_set_controller_port_device(unsigned port, unsigned device) {
-	UNUSED(port);
-	UNUSED(device);
+        UNUSED(port);
+        UNUSED(device);
 }
 
 bool retro_load_game_special(unsigned game_type, const struct retro_game_info* info, size_t num_info) {
-	UNUSED(game_type);
-	UNUSED(info);
-	UNUSED(num_info);
-	return false;
+        UNUSED(game_type);
+        UNUSED(info);
+        UNUSED(num_info);
+        return false;
 }
 
 void* retro_get_memory_data(unsigned id) {
-	switch (id) {
-	case RETRO_MEMORY_SAVE_RAM:
-		return savedata;
-	case RETRO_MEMORY_RTC:
-		switch (core->platform(core)) {
+        switch (id) {
+        case RETRO_MEMORY_SAVE_RAM:
+                return savedata;
+        case RETRO_MEMORY_RTC:
+                switch (core->platform(core)) {
 #ifdef M_CORE_GB
-		case mPLATFORM_GB:
-			switch (((struct GB*) core->board)->memory.mbcType) {
-			case GB_MBC3_RTC:
-				return &((uint8_t*) savedata)[((struct GB*) core->board)->sramSize];
-			default:
-				break;
-			}
+                case mPLATFORM_GB:
+                        switch (((struct GB*) core->board)->memory.mbcType) {
+                        case GB_MBC3_RTC:
+                                return &((uint8_t*) savedata)[((struct GB*) core->board)->sramSize];
+                        default:
+                                break;
+                        }
 #endif
-		default:
-			break;
-		}
-	case RETRO_MEMORY_SYSTEM_RAM:
-		switch (core->platform(core)) {
+                default:
+                        break;
+                }
+        case RETRO_MEMORY_SYSTEM_RAM:
+                switch (core->platform(core)) {
 #ifdef M_CORE_GB
-		case mPLATFORM_GB:
-			return ((struct GB*)core->board)->memory.wram;
+                case mPLATFORM_GB:
+                        return ((struct GB*)core->board)->memory.wram;
 #endif
 #ifdef M_CORE_GBA
-		case mPLATFORM_GBA:
-			return ((struct GBA*)core->board)->memory.wram;
+                case mPLATFORM_GBA:
+                        return ((struct GBA*)core->board)->memory.wram;
 #endif
-		default:
-			break;
-		}
-		break;
-	case RETRO_MEMORY_VIDEO_RAM:
-		switch (core->platform(core)) {
+                default:
+                        break;
+                }
+                break;
+        case RETRO_MEMORY_VIDEO_RAM:
+                switch (core->platform(core)) {
 #ifdef M_CORE_GB
-		case mPLATFORM_GB:
-			return ((struct GB*)core->board)->video.renderer->vram;
+                case mPLATFORM_GB:
+                        return ((struct GB*)core->board)->video.renderer->vram;
 #endif
 #ifdef M_CORE_GBA
-		case mPLATFORM_GBA:
-			return ((struct GBA*)core->board)->video.renderer->vram;
+                case mPLATFORM_GBA:
+                        return ((struct GBA*)core->board)->video.renderer->vram;
 #endif
-		default:
-			break;
-		}
-		break;
-	default:
-		break;
-	}
-	return NULL;
+                default:
+                        break;
+                }
+                break;
+        default:
+                break;
+        }
+        return NULL;
 }
 
 size_t retro_get_memory_size(unsigned id) {
-	switch (id) {
-	case RETRO_MEMORY_SAVE_RAM:
-		switch (core->platform(core)) {
+        switch (id) {
+        case RETRO_MEMORY_SAVE_RAM:
+                switch (core->platform(core)) {
 #ifdef M_CORE_GBA
-		case mPLATFORM_GBA:
-			switch (((struct GBA*) core->board)->memory.savedata.type) {
-			case GBA_SAVEDATA_AUTODETECT:
-				return GBA_SIZE_FLASH1M;
-			default:
-				return GBASavedataSize(&((struct GBA*) core->board)->memory.savedata);
-			}
+                case mPLATFORM_GBA:
+                        switch (((struct GBA*) core->board)->memory.savedata.type) {
+                        case GBA_SAVEDATA_AUTODETECT:
+                                return GBA_SIZE_FLASH1M;
+                        default:
+                                return GBASavedataSize(&((struct GBA*) core->board)->memory.savedata);
+                        }
 #endif
 #ifdef M_CORE_GB
-		case mPLATFORM_GB:
-			return ((struct GB*) core->board)->sramSize;
+                case mPLATFORM_GB:
+                        return ((struct GB*) core->board)->sramSize;
 #endif
-		default:
-			break;
-		}
-		break;
-	case RETRO_MEMORY_RTC:
-		switch (core->platform(core)) {
+                default:
+                        break;
+                }
+                break;
+        case RETRO_MEMORY_RTC:
+                switch (core->platform(core)) {
 #ifdef M_CORE_GB
-		case mPLATFORM_GB:
-			switch (((struct GB*) core->board)->memory.mbcType) {
-			case GB_MBC3_RTC:
-				return sizeof(struct GBMBCRTCSaveBuffer);
-			default:
-				break;
-			}
+                case mPLATFORM_GB:
+                        switch (((struct GB*) core->board)->memory.mbcType) {
+                        case GB_MBC3_RTC:
+                                return sizeof(struct GBMBCRTCSaveBuffer);
+                        default:
+                                break;
+                        }
 #endif
-		default:
-			break;
-		}
-		break;
-	case RETRO_MEMORY_SYSTEM_RAM:
-		return GB_SIZE_WORKING_RAM;
-	case RETRO_MEMORY_VIDEO_RAM:
-		return GBA_SIZE_VRAM;
-	default:
-		break;
-	}
-	return 0;
+                default:
+                        break;
+                }
+                break;
+        case RETRO_MEMORY_SYSTEM_RAM:
+                return GB_SIZE_WORKING_RAM;
+        case RETRO_MEMORY_VIDEO_RAM:
+                return GBA_SIZE_VRAM;
+        default:
+                break;
+        }
+        return 0;
 }
 
 void GBARetroLog(struct mLogger* logger, int category, enum mLogLevel level, const char* format, va_list args) {
-	UNUSED(logger);
-	if (!logCallback) {
-		return;
-	}
+        UNUSED(logger);
+        if (!logCallback) {
+                return;
+        }
 
-	char message[128];
-	vsnprintf(message, sizeof(message), format, args);
+        char message[128];
+        vsnprintf(message, sizeof(message), format, args);
 
-	enum retro_log_level retroLevel = RETRO_LOG_INFO;
-	switch (level) {
-	case mLOG_ERROR:
-	case mLOG_FATAL:
+        enum retro_log_level retroLevel = RETRO_LOG_INFO;
+        switch (level) {
+        case mLOG_ERROR:
+        case mLOG_FATAL:
     case mLOG_ALL:
-		retroLevel = RETRO_LOG_ERROR;
-		break;
-	case mLOG_WARN:
-		retroLevel = RETRO_LOG_WARN;
-		break;
-	case mLOG_INFO:
-		retroLevel = RETRO_LOG_INFO;
-		break;
-	case mLOG_GAME_ERROR:
-	case mLOG_STUB:
+                retroLevel = RETRO_LOG_ERROR;
+                break;
+        case mLOG_WARN:
+                retroLevel = RETRO_LOG_WARN;
+                break;
+        case mLOG_INFO:
+                retroLevel = RETRO_LOG_INFO;
+                break;
+        case mLOG_GAME_ERROR:
+        case mLOG_STUB:
 #ifdef NDEBUG
-		return;
+                return;
 #else
-		retroLevel = RETRO_LOG_DEBUG;
-		break;
+                retroLevel = RETRO_LOG_DEBUG;
+                break;
 #endif
-	case mLOG_DEBUG:
-		retroLevel = RETRO_LOG_DEBUG;
-		break;
-	}
+        case mLOG_DEBUG:
+                retroLevel = RETRO_LOG_DEBUG;
+                break;
+        }
 #ifdef NDEBUG
-	static int biosCat = -1;
-	if (biosCat < 0) {
-		biosCat = mLogCategoryById("gba.bios");
-	}
+        static int biosCat = -1;
+        if (biosCat < 0) {
+                biosCat = mLogCategoryById("gba.bios");
+        }
 
-	if (category == biosCat) {
-		return;
-	}
+        if (category == biosCat) {
+                return;
+        }
 #endif
-	logCallback(retroLevel, "%s: %s\n", mLogCategoryName(category), message);
+        logCallback(retroLevel, "%s: %s\n", mLogCategoryName(category), message);
 }
 
 /* Used only for GB/GBC content */
 static void _postAudioBuffer(struct mAVStream* stream, struct mAudioBuffer* buffer) {
-	UNUSED(stream);
-	int produced = mAudioBufferRead(buffer, audioSampleBuffer, GB_SAMPLES);
-	if (produced > 0) {
-		if (audioLowPassEnabled) {
-			_audioLowPassFilter(audioSampleBuffer, produced);
-		}
-		audioCallback(audioSampleBuffer, (size_t)produced);
-	}
+        UNUSED(stream);
+        int produced = mAudioBufferRead(buffer, audioSampleBuffer, GB_SAMPLES);
+        if (produced > 0) {
+                if (audioLowPassEnabled) {
+                        _audioLowPassFilter(audioSampleBuffer, produced);
+                }
+                audioCallback(audioSampleBuffer, (size_t)produced);
+        }
 }
 
 static void _audioRateChanged(struct mAVStream* stream, unsigned rate) {
-	UNUSED(stream);
-	/* For GBA content, audio is resampled
-	 * to a fixed output rate so internal
-	 * rate changes do not require frontend
-	 * notification */
+        UNUSED(stream);
+        /* For GBA content, audio is resampled
+         * to a fixed output rate so internal
+         * rate changes do not require frontend
+         * notification */
 #ifdef M_CORE_GBA
-	if (core->platform(core) != mPLATFORM_GBA) {
+        if (core->platform(core) != mPLATFORM_GBA) {
 #endif
-		updateAudioRate = true;
+                updateAudioRate = true;
 #ifdef M_CORE_GBA
-	}
+        }
 #endif
 }
 
 static void _setRumble(struct mRumbleIntegrator* rumble, float level) {
-	UNUSED(rumble);
-	if (!rumbleInitDone) {
-		_initRumble();
-	}
-	if (!rumbleCallback) {
-		return;
-	}
+        UNUSED(rumble);
+        if (!rumbleInitDone) {
+                _initRumble();
+        }
+        if (!rumbleCallback) {
+                return;
+        }
 
-	rumbleCallback(0, RETRO_RUMBLE_STRONG, level * 0xFFFF);
-	rumbleCallback(0, RETRO_RUMBLE_WEAK, level * 0xFFFF);
+        rumbleCallback(0, RETRO_RUMBLE_STRONG, level * 0xFFFF);
+        rumbleCallback(0, RETRO_RUMBLE_WEAK, level * 0xFFFF);
 }
 
 static void _updateLux(struct GBALuminanceSource* lux) {
-	UNUSED(lux);
-	struct retro_variable var = {
-		.key = "mgba_solar_sensor_level",
-		.value = 0
-	};
-	bool luxVarUpdated = envVarsUpdated;
+        UNUSED(lux);
+        struct retro_variable var = {
+                .key = "mgba_solar_sensor_level",
+                .value = 0
+        };
+        bool luxVarUpdated = envVarsUpdated;
 
-	if (luxVarUpdated && (!environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value)) {
-		luxVarUpdated = false;
-	}
+        if (luxVarUpdated && (!environCallback(RETRO_ENVIRONMENT_GET_VARIABLE, &var) || !var.value)) {
+                luxVarUpdated = false;
+        }
 
-	if (luxVarUpdated) {
-		luxSensorUsed = strcmp(var.value, "sensor") == 0;
-	}
+        if (luxVarUpdated) {
+                luxSensorUsed = strcmp(var.value, "sensor") == 0;
+        }
 
-	if (luxSensorUsed) {
-		_initSensors();
-		float fLux = luxSensorEnabled ? sensorGetCallback(0, RETRO_SENSOR_ILLUMINANCE) : 0.0f;
-		luxLevel = cbrtf(fLux) * 8;
-	} else {
-		if (luxVarUpdated) {
-			char* end;
-			int newLuxLevelIndex = strtol(var.value, &end, 10);
+        if (luxSensorUsed) {
+                _initSensors();
+                float fLux = luxSensorEnabled ? sensorGetCallback(0, RETRO_SENSOR_ILLUMINANCE) : 0.0f;
+                luxLevel = cbrtf(fLux) * 8;
+        } else {
+                if (luxVarUpdated) {
+                        char* end;
+                        int newLuxLevelIndex = strtol(var.value, &end, 10);
 
-			if (!*end) {
-				if (newLuxLevelIndex > 10) {
-					luxLevelIndex = 10;
-				} else if (newLuxLevelIndex < 0) {
-					luxLevelIndex = 0;
-				} else {
-					luxLevelIndex = newLuxLevelIndex;
-				}
-			}
-		}
+                        if (!*end) {
+                                if (newLuxLevelIndex > 10) {
+                                        luxLevelIndex = 10;
+                                } else if (newLuxLevelIndex < 0) {
+                                        luxLevelIndex = 0;
+                                } else {
+                                        luxLevelIndex = newLuxLevelIndex;
+                                }
+                        }
+                }
 
-		luxLevel = 0x16;
-		if (luxLevelIndex > 0) {
-			luxLevel += GBA_LUX_LEVELS[luxLevelIndex - 1];
-		}
-	}
+                luxLevel = 0x16;
+                if (luxLevelIndex > 0) {
+                        luxLevel += GBA_LUX_LEVELS[luxLevelIndex - 1];
+                }
+        }
 
-	envVarsUpdated = false;
+        envVarsUpdated = false;
 }
 
 static uint8_t _readLux(struct GBALuminanceSource* lux) {
-	UNUSED(lux);
-	return 0xFF - luxLevel;
+        UNUSED(lux);
+        return 0xFF - luxLevel;
 }
 
 static void _updateCamera(const uint32_t* buffer, unsigned width, unsigned height, size_t pitch) {
-	if (!camData || width > camWidth || height > camHeight) {
-		if (camData) {
-			free(camData);
-			camData = NULL;
-		}
-		unsigned bufPitch = pitch / sizeof(*buffer);
-		unsigned bufHeight = height;
-		if (imcapWidth > bufPitch) {
-			bufPitch = imcapWidth;
-		}
-		if (imcapHeight > bufHeight) {
-			bufHeight = imcapHeight;
-		}
-		camData = malloc(sizeof(*buffer) * bufHeight * bufPitch);
-		memset(camData, 0xFF, sizeof(*buffer) * bufHeight * bufPitch);
-		camWidth = width;
-		camHeight = bufHeight;
-		camStride = bufPitch;
-	}
-	size_t i;
-	for (i = 0; i < height; ++i) {
-		memcpy(&camData[camStride * i], &buffer[pitch * i / sizeof(*buffer)], pitch);
-	}
+        if (!camData || width > camWidth || height > camHeight) {
+                if (camData) {
+                        free(camData);
+                        camData = NULL;
+                }
+                unsigned bufPitch = pitch / sizeof(*buffer);
+                unsigned bufHeight = height;
+                if (imcapWidth > bufPitch) {
+                        bufPitch = imcapWidth;
+                }
+                if (imcapHeight > bufHeight) {
+                        bufHeight = imcapHeight;
+                }
+                camData = malloc(sizeof(*buffer) * bufHeight * bufPitch);
+                memset(camData, 0xFF, sizeof(*buffer) * bufHeight * bufPitch);
+                camWidth = width;
+                camHeight = bufHeight;
+                camStride = bufPitch;
+        }
+        size_t i;
+        for (i = 0; i < height; ++i) {
+                memcpy(&camData[camStride * i], &buffer[pitch * i / sizeof(*buffer)], pitch);
+        }
 }
 
 static void _startImage(struct mImageSource* image, unsigned w, unsigned h, int colorFormats) {
-	UNUSED(image);
-	UNUSED(colorFormats);
+        UNUSED(image);
+        UNUSED(colorFormats);
 
-	if (camData) {
-		free(camData);
-	}
-	camData = NULL;
-	imcapWidth = w;
-	imcapHeight = h;
-	cam.start();
+        if (camData) {
+                free(camData);
+        }
+        camData = NULL;
+        imcapWidth = w;
+        imcapHeight = h;
+        cam.start();
 }
 
 static void _stopImage(struct mImageSource* image) {
-	UNUSED(image);
-	cam.stop();
+        UNUSED(image);
+        cam.stop();
 }
 
 static void _requestImage(struct mImageSource* image, const void** buffer, size_t* stride, enum mColorFormat* colorFormat) {
-	UNUSED(image);
-	if (!camData) {
-		cam.start();
-		*buffer = NULL;
-		return;
-	}
-	size_t offset = 0;
-	if (imcapWidth < camWidth) {
-		offset += (camWidth - imcapWidth) / 2;
-	}
-	if (imcapHeight < camHeight) {
-		offset += (camHeight - imcapHeight) / 2 * camStride;
-	}
+        UNUSED(image);
+        if (!camData) {
+                cam.start();
+                *buffer = NULL;
+                return;
+        }
+        size_t offset = 0;
+        if (imcapWidth < camWidth) {
+                offset += (camWidth - imcapWidth) / 2;
+        }
+        if (imcapHeight < camHeight) {
+                offset += (camHeight - imcapHeight) / 2 * camStride;
+        }
 
-	*buffer = &camData[offset];
-	*stride = camStride;
-	*colorFormat = mCOLOR_XRGB8;
+        *buffer = &camData[offset];
+        *stride = camStride;
+        *colorFormat = mCOLOR_XRGB8;
 }
 
 static void _updateRotation(struct mRotationSource* source) {
-	UNUSED(source);
-	tiltX = 0;
-	tiltY = 0;
-	gyroZ = 0;
-	_initSensors();
-	if (tiltEnabled) {
-		tiltX = sensorGetCallback(0, RETRO_SENSOR_ACCELEROMETER_X) * 3e8f;
-		tiltY = sensorGetCallback(0, RETRO_SENSOR_ACCELEROMETER_Y) * -3e8f;
-	}
-	if (gyroEnabled) {
-		gyroZ = sensorGetCallback(0, RETRO_SENSOR_GYROSCOPE_Z) * -5.5e8f;
-	}
+        UNUSED(source);
+        tiltX = 0;
+        tiltY = 0;
+        gyroZ = 0;
+        _initSensors();
+        if (tiltEnabled) {
+                tiltX = sensorGetCallback(0, RETRO_SENSOR_ACCELEROMETER_X) * 3e8f;
+                tiltY = sensorGetCallback(0, RETRO_SENSOR_ACCELEROMETER_Y) * -3e8f;
+        }
+        if (gyroEnabled) {
+                gyroZ = sensorGetCallback(0, RETRO_SENSOR_GYROSCOPE_Z) * -5.5e8f;
+        }
 }
 
 static int32_t _readTiltX(struct mRotationSource* source) {
-	UNUSED(source);
-	return tiltX;
+        UNUSED(source);
+        return tiltX;
 }
 
 static int32_t _readTiltY(struct mRotationSource* source) {
-	UNUSED(source);
-	return tiltY;
+        UNUSED(source);
+        return tiltY;
 }
 
 static int32_t _readGyroZ(struct mRotationSource* source) {
-	UNUSED(source);
-	return gyroZ;
+        UNUSED(source);
+        return gyroZ;
 }
