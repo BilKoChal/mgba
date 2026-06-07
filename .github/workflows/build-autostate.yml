@@ -12,6 +12,14 @@
 # GitHub Actions run page without needing a release.
 #
 # Trigger: every push and pull-request, plus manual dispatch.
+#
+# Android build note:
+#   The Android NDK provides strtof_l() natively. When building with
+#   platform=unix the Makefile adds -DHAVE_LOCALE but not -DHAVE_STRTOF_L,
+#   causing mGBA's own strtof_l definition (src/util/formatting.c) to
+#   conflict with the NDK's inline version. We pass PLATFORM_DEFINES with
+#   -DHAVE_STRTOF_L (and -DHAVE_USELOCALE for proper locale switching)
+#   to skip mGBA's duplicate definitions.
 
 name: Build mGBA autostate
 
@@ -179,6 +187,14 @@ jobs:
           # platform=unix sets TARGET=mgba_libretro.so and fpic=-fPIC
           # We override SHARED: Android linker doesn't support --version-script
           # -ldl is essential for dladdr() used by autoload self-detection
+          #
+          # PLATFORM_DEFINES notes for Android NDK:
+          #   -DHAVE_STRTOF_L : Android NDK already provides strtof_l() as an
+          #     inline in <legacy_stdlib_inlines.h>; without this define mGBA's
+          #     own copy in src/util/formatting.c causes a redefinition error.
+          #   -DHAVE_USELOCALE : Android NDK API 21+ provides uselocale() /
+          #     newlocale() / freelocale(), so ftostr_l() can switch locales
+          #     properly instead of silently ignoring the locale argument.
           make -f Makefile.libretro \
             platform=unix \
             CC="$CC" \
@@ -187,6 +203,7 @@ jobs:
             RANLIB="$RANLIB" \
             STRIP="$STRIP" \
             SHARED="-shared -fPIC" \
+            PLATFORM_DEFINES="-DHAVE_STRTOF_L -DHAVE_USELOCALE" \
             LDFLAGS="-ldl" \
             -j$(nproc)
 
